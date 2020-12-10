@@ -106,7 +106,7 @@ function addFloatDiv(){
 		// 获取鼠标在元素上的位置（鼠标按下时在元素上得位置）
 		var X = e.clientX - $(floatdivid).offset().left;
 		var Y = e.clientY - $(floatdivid).offset().top + $(document).scrollTop();
-		//禁用点击事件
+		//禁用点击事件1
 		$(document).mousemove(function (e) {
 			$("body").css({ "-moz-user-select": "none", "-webkit-user-select": "none", "user-select": "none" });
 			if ($("#fullscreen-back-div").length === 0) {
