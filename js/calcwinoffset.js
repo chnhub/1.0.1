@@ -1,0 +1,1 @@
+var offset={win_width:window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth,win_height:window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight,win_ST:window.screenTop,win_SL:window.screenLeft};sogouExplorer.extension.sendRequest({cmd:"calcwinoffset",offset:offset},function(){});

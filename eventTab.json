@@ -1,0 +1,21 @@
+[
+// 元素事件表
+{
+   "event": [{"text":"元素事件", "children":[{"value": 1, "text": "click"}]}] 
+}
+,
+// 元素定位方式表
+{
+    "selector_mode": [{"id":"1", "name":"jquery" , "order": 1}, {"id":"2", "name":"xpath" , "order": 2}] 
+}
+,
+// 菜单的按钮表
+{
+    "content_script_menu": [{"id":"1", "name":"生成学员信息" , "order": 1}, {"id":"2", "name":"生成教练信息" , "order": 2}] 
+}
+,
+// 按钮具体功能事件表
+{
+    "event_menu": [{"id":"1", "menuid":"1", "selectormode":"jquery", "selector":"#id","eventid":"1", "param":"", "order": 1}, {"id":"2", "name":"生成教练信息" , "order": 2}] 
+}
+]
