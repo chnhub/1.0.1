@@ -108,6 +108,7 @@ function addFloatDiv(){
 		var Y = e.clientY - $(floatdivid).offset().top + $(document).scrollTop();
 		//禁用点击事件12
 		$(document).mousemove(function (e) {
+			$(floatdivid+">div>button").css({"pointer-events":"none"});
 			$("body").css({ "-moz-user-select": "none", "-webkit-user-select": "none", "user-select": "none" });
 			if ($("#fullscreen-back-div").length === 0) {
 				$("body").append("<div id='fullscreen-back-div' style='z-index:998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
@@ -128,6 +129,7 @@ function addFloatDiv(){
 	});
 	// 鼠标抬起事件
 	$(document).mouseup(function(){
+		$(floatdivid+">div>button").css({"pointer-events":""});
 		$("body").css({"-moz-user-select":"","-webkit-user-select":"","user-select":""});
 		$("#fullscreen-back-div").remove();
 		$(document).unbind("mousemove");	
