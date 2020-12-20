@@ -1,7 +1,8 @@
 
 var PROJECT_MAIN_TABLE = "mainTable";// 主表名
-var PROJECT_IP_TABLE = "allowInjectionIP";// 主表名
+var PROJECT_IP_TABLE = "allowInjectionIP";// 允许插入IP表名
 var CHROME_LAST_ERROR = null; //chrome的报错信息
+var Tab = null;
 
 //初始化页面
 (function () {
@@ -9,8 +10,9 @@ var CHROME_LAST_ERROR = null; //chrome的报错信息
     (function () {
         settingConfigInit(PROJECT_MAIN_TABLE);
         settingConfigInit("allowInjectionIP");
+        initTab();
         //insertFloatDiv();
-
+        
     })();
 })();
 //添加右键菜单
@@ -43,127 +45,9 @@ function insertFloatDiv(params) {
 
 }
 
-/**
- * 创建新表
- * @param {"创建表名称"} tableName 
- * @param {"表创建时默认数据"} data
- */
-function settingConfigInit(tableName, data = null) {
-    //var tableName = PROJECT_MAIN_TABLE;
-    data?1:data = new Array();
-    //var mainTable = new Array();
-    chrome.storage.sync.get([tableName], function (result) {
-        console.log("tableName为" + tableName);
-        console.log(result[tableName]);
-        if (result[tableName]) {
-            console.log('已存在' + tableName + '表');
 
-        } else {
-            chrome.storage.sync.set({ [tableName]: data }, function () {
-                console.log('创建' + tableName + '表');
-            });
-        }
+/* start----------------功能项----------------start */
 
-    });
-
-}
-/**
- * 打印/查询表
- * @param {"表名"} key 
- * @param {"callback:result(查询的结果)"} callback 
- */
-function queryChromeStorage(key, callback) {
-    chrome.storage.sync.get(key, function (result) {
-        callback(result);
-    });
-
-}
-/**
- * 清除表中特定数据
- * @param {*} tabname 需要清除storage中的key值，tabname为空清除全部
- */
-function delDataInTab(tabname = null, data = null){
-    queryChromeStorage(null,function(result){
-        console.log("---------sync区域所有数据：↓---------");
-        console.log(result);
-        console.log("---------sync区域所有数据：↑---------");
-    });
-    if(!tabname){        
-        // sync 区域
-        chrome.storage.sync.clear(function(){
-            //do something
-            console.log("sync区域所有数据已清除");
-        });
-        return;
-    }
-    if(!data){
-
-        return;
-    }
-
-    // 从存储中读取数据
-    chrome.storage.sync.get(tabname, function(result){
-        //console.log("需要清除的数据：" + tabname + JSON.stringify(result) + "：↓");
-        console.log("需要清除的数据：" + "↓");
-        console.log(data);
-        var l = result[tabname].length; // 原数组长度
-        if (result[tabname]) {
-            for(var i = 0; i < result[tabname].length; i++){
-                if(data.indexOf(result[tabname][i])>=0){
-                    result[tabname].splice(i, 1);;
-                    break;
-                }
-            }
-            if(l===result[tabname].length){console.log(tabname,"表无该数据：", data);return;}
-            // sync 区域
-            chrome.storage.sync.set({[tabname]: result[tabname]}, function(){
-                //do something
-                console.log(tabname,"表已更新",l-result[tabname].length,"行");
-            });
-        }
-
-    });
-
-}
-
-/**
- * 写入特定storage数据
- * @param {*} tabname 
- * @param {*} data 
- */
-function addChromeKeyStorage(tabname = null, data){
-    if(!tabname){console.log("tabname不能为空");return;}
-    // 往存储中写入数据
-    chrome.storage.sync.set({[tabname]: data}, function() {                
-        console.log(tabname,"写入成功：", data);
-        var bg = chrome.extension.getBackgroundPage();
-        queryChromeStorage(null,function(result){
-            console.log("---------sync区域所有数据：↓---------");
-            console.log(result);
-            console.log("---------sync区域所有数据：↑---------");
-        });
-    });
-}
-/**
- * 向特定表插入特定数据，不能重复，类似set
- * @param {*} tabname 
- * @param {*} data 
- */
-function addDataToTabNoSameValue(tabname, data){
-    var bg = chrome.extension.getBackgroundPage();
-    queryChromeStorage(tabname,function(result){
-        if(!result[tabname]){console.log(tabname+"表不存在");return};
-        for (var i = 0; i < result[tabname].length; i++) {
-            const element = result[tabname][i];
-            if(data === element){
-                console.log(tabname + "->" + JSON.stringify(data) + "->已存在");
-                return;
-            }
-        }
-        result[tabname].push(data);
-        addChromeKeyStorage(tabname,result[tabname]);
-    });
-}
 /**
  * 是否显示浮动菜单
  * @param {"页面的url"} url 
@@ -197,8 +81,205 @@ function addurlToTable(url){
     url&&addDataToTabNoSameValue(PROJECT_IP_TABLE,url);
 
 }
+/* end----------------功能项----------------end */
+
+/* start----------------快捷操作业务表----------------start */
+function delClickEventTab(tabname, data){
+    tabname||(tabname = "click_Event_Tab");
+    var tabChilden =["children","value"];
+    // 从存储中读取数据
+    chrome.storage.sync.get(tabname, function(result){
+        //console.log("需要清除的数据：" + tabname + JSON.stringify(result) + "：↓");
+        //var l = result[tabname].length; // 原数组长度
+  
+        if (result[tabname]) {
+            for(var i = 0; i < result[tabname].length; i++){
+                // if(data.indexOf(result[tabname][i])>=0){
+                //     result[tabname].splice(i, 1);
+                //     break;
+                // }
+                for(var j = 0; j < result[tabname][i][tabChilden[0]].length; j++){
+                    if(data.indexOf(result[tabname][i][tabChilden[0]])||result[tabname][i][tabChilden[0]].indexOf(data)){
+                        //删除数组内容
+                        result[tabname][i][tabChilden[0]].splice(i, 1);
+                        break;
+                    }
+                }
+
+            }
+            // sync 区域
+            chrome.storage.sync.set({[tabname]: result[tabname]}, function(){
+                //do something
+                console.log(tabname,"表已更新:" + data);
+            });
+        }
+
+    });
+}
+function initTab(){
+    initTabByName("click_event_tab");
+    initTabByName("selector_mode");
+    var data =  queryChromeStorage2("click_event_tab");
+    console.log(data);
+}
+//初始化指定表名
+function initTabByName(tabname){
+    //data : {[{"text":"元素事件", "children":[{"value": 1, "text": "click"}]}]  }
+    //var defaultTabData = [{"value":"group1", "text":"元素事件", "children":[{"value": 1, "text": "click"}]}, {"value":"group2", "text":"自定义事件", "children":[{"value": 2, "text": "wait"}]}];
+    //default_tab 从default_tab.js引入
+    var defaultTabData = default_tab[tabname];
+    settingConfigInit(tabname, defaultTabData);
+}
+
+/* end----------------快捷操作业务表----------------end */
 
 
+/* start----------------数据库----------------start */
+/**
+ * 创建新表
+ * @param {"创建表名称"} tableName 
+ * @param {"表创建时默认数据"} data
+ */
+function settingConfigInit(tableName, data = null) {
+    //var tableName = PROJECT_MAIN_TABLE;
+    data?1:data = new Array();
+    //var mainTable = new Array();
+    chrome.storage.sync.get([tableName], function (result) {
+        console.log("tableName为" + tableName);
+        console.log(result[tableName]);
+        if (result[tableName]) {
+            console.log('已存在' + tableName + '表');
+
+        } else {
+            chrome.storage.sync.set({ [tableName]: data }, function () {
+                console.log('创建' + tableName + '表');
+            });
+        }
+
+    });
+
+}
+
+/**
+ * 打印/查询表
+ * @param {"表名"} key 
+ * @param {"callback:result(查询的结果)"} callback 
+ */
+function queryChromeStorage(key, callback) {
+    chrome.storage.sync.get(key, function (result) {
+        callback(result);
+    });
+
+}
+function queryChromeStorage2(key, callback = null) {
+
+    //function query(){
+       return new Promise((resolve, reject) => {
+            chrome.storage.sync.get(key, function (result) {
+                resolve(result);
+            });
+        });
+    //}
+
+    // console.log(1);
+    // var result = await query();
+    // console.log("1111111111111111111111111111111111"+result);
+    // console.log(2);
+}
+/**
+ * 清除表中特定数据
+ * @param {*} tabname 需要清除storage中的表名，tabname为空清除全部（目前只支持二级json）
+ */
+function delDataInTab(tabname = null, data = null){
+    queryChromeStorage(null,function(result){
+        console.log("---------sync区域所有数据：↓---------");
+        console.log(result);
+        console.log("---------sync区域所有数据：↑---------");
+    });
+    if(!tabname){        
+        // sync 区域
+        chrome.storage.sync.clear(function(){
+            //do something
+            console.log("sync区域所有数据已清除");
+        });
+        return;
+    }
+    if(!data){
+
+        return;
+    }
+
+    // 从存储中读取数据
+    chrome.storage.sync.get(tabname, function(result){
+        //console.log("需要清除的数据：" + tabname + JSON.stringify(result) + "：↓");
+        console.log("需要清除的数据：" + "↓");
+        console.log(data);
+        var l = result[tabname].length; // 原数组长度
+        if (result[tabname]) {
+            for(var i = 0; i < result[tabname].length; i++){
+                // if(data.indexOf(result[tabname][i])>=0){
+                //     result[tabname].splice(i, 1);
+                //     break;
+                // }
+                if (result[tabname][i]&&JSON.stringify(result[tabname][i]).indexOf(data)) {
+                    result[tabname].splice(i, 1);
+                    break;
+                }
+            }
+            if(l===result[tabname].length){console.log(tabname,"表无该数据：", data);return;}
+            // sync 区域
+            chrome.storage.sync.set({[tabname]: result[tabname]}, function(){
+                //do something
+                console.log(tabname,"表已更新",l-result[tabname].length,"行");
+            });
+        }
+
+    });
+
+}
+
+/**
+ * 写入特定storage数据
+ * @param {*} tabname 
+ * @param {*} data 
+ */
+function addChromeKeyStorage(tabname = null, data){
+    if(!tabname){console.log("tabname不能为空");return;}
+    // 往存储中写入数据
+    chrome.storage.sync.set({[tabname]: data}, function() {                
+        console.log(tabname,"写入成功：", data);
+        var bg = chrome.extension.getBackgroundPage();
+        queryChromeStorage(null,function(result){
+            console.log("---------sync区域所有数据：↓---------");
+            console.log(result);
+            console.log("---------sync区域所有数据：↑---------");
+        });
+    });
+}
+
+/**
+ * 向特定表插入特定数据，不能重复，类似set
+ * @param {*} tabname 
+ * @param {*} data 
+ */
+function addDataToTabNoSameValue(tabname, data){
+    var bg = chrome.extension.getBackgroundPage();
+    queryChromeStorage(tabname,function(result){
+        if(!result[tabname]){console.log(tabname+"表不存在");return};
+        for (var i = 0; i < result[tabname].length; i++) {
+            const element = result[tabname][i];
+            if(data === element){
+                console.log(tabname + "->" + JSON.stringify(data) + "->已存在");
+                return;
+            }
+        }
+        result[tabname].push(data);
+        addChromeKeyStorage(tabname,result[tabname]);
+    });
+}
+/* end----------------数据库----------------end */
+
+/* start----------------发送消息----------------start */
 /**
  * 获取当前页面id
  * @param {"回调函数：参数为tabid"} callback 
@@ -262,4 +343,4 @@ function sendMessage2(message, notips = true, callback = null) {
     });
     
 }
-
+/* end----------------发送消息----------------end */

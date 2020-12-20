@@ -114,6 +114,7 @@ function addFloatDiv(){
 				$("body").append("<div id='fullscreen-back-div' style='z-index:998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
 			}
 			//console.log(e.clientX ,e.clientY);
+			//添加逻辑鼠标移动小于10还是会触发click
 			e = e || window.event;
 			var x = e.clientX - X;
 			var y = e.clientY - Y;
