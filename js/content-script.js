@@ -106,13 +106,15 @@ function addFloatDiv(){
 		// 获取鼠标在元素上的位置（鼠标按下时在元素上得位置）
 		var X = e.clientX - $(floatdivid).offset().left;
 		var Y = e.clientY - $(floatdivid).offset().top + $(document).scrollTop();
-
+		//禁用点击事件12
 		$(document).mousemove(function (e) {
+			$(floatdivid+">div>button").css({"pointer-events":"none"});
 			$("body").css({ "-moz-user-select": "none", "-webkit-user-select": "none", "user-select": "none" });
 			if ($("#fullscreen-back-div").length === 0) {
 				$("body").append("<div id='fullscreen-back-div' style='z-index:998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
 			}
 			//console.log(e.clientX ,e.clientY);
+			//添加逻辑鼠标移动小于10还是会触发click
 			e = e || window.event;
 			var x = e.clientX - X;
 			var y = e.clientY - Y;
@@ -128,6 +130,7 @@ function addFloatDiv(){
 	});
 	// 鼠标抬起事件
 	$(document).mouseup(function(){
+		$(floatdivid+">div>button").css({"pointer-events":""});
 		$("body").css({"-moz-user-select":"","-webkit-user-select":"","user-select":""});
 		$("#fullscreen-back-div").remove();
 		$(document).unbind("mousemove");	

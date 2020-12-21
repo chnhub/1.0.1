@@ -6,16 +6,28 @@
 ,
 // 元素定位方式表
 {
-    "selector_mode": [{"id":"1", "name":"jquery" , "order": 1}, {"id":"2", "name":"xpath" , "order": 2}] 
+    "selector_mode": [{"selector_modeid":"1", "name":"jquery" , "order": 1}, {"id":"2", "name":"xpath" , "order": 2}] 
 }
 ,
 // 菜单的按钮表
 {
-    "content_script_menu": [{"id":"1", "name":"生成学员信息" , "order": 1}, {"id":"2", "name":"生成教练信息" , "order": 2}] 
+    "btnmenu": [{"btnid":"1", "name":"生成学员信息" , "order": 1}, {"id":"2", "name":"生成教练信息" , "order": 2}] 
 }
 ,
 // 按钮具体功能事件表
 {
-    "event_menu": [{"id":"1", "menuid":"1", "selectormode":"jquery", "selector":"#id","eventid":"1", "param":"", "order": 1}, {"id":"2", "name":"生成教练信息" , "order": 2}] 
+    "event_menu": [
+        {
+            "name":"事件1",
+            "id": "1",
+            "btnid": "1",
+            "selectormode": "jquery",
+            "selector": "#id",
+            "eventid": "1",
+            "params": "",
+            "code": "",
+            "order": 1
+        }
+    ]
 }
 ]
