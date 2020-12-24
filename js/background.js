@@ -120,6 +120,7 @@ function initTab(){
     initTabByName("click_event_tab");
     initTabByName("selector_mode");
     initTabByName("event_list");
+    initTabByName("btnmenu");
     var data =  queryChromeStorage2("click_event_tab");
     console.log(data);
 }

@@ -1,8 +1,17 @@
 
 {
+    //表数据
     var click_event_tab = null;
     var selector_mode = null;
     var event_list = null;
+    var btnmenu_tab = null;
+    // 插入的行，变色需要
+    var cell_start_index = null;
+    var cell_end_index = null;
+    var cell_click_times = 0;
+    // 选中cell的index
+    var cell_select_position = {};
+
 
     var collapse_json = { data: [{ "id": "1", "name": "生成学员信息" }, { "id": "2", "name": "生成教练信息" }] };
     $('#accordion').on('show.bs.collapse', this, function (e) {
@@ -13,12 +22,13 @@
         click_event_tab = await queryChromeStorage2("click_event_tab");
         selector_mode = await queryChromeStorage2("selector_mode");
         event_list = await queryChromeStorage2("event_list");
+        btnmenu_tab = await queryChromeStorage2("btnmenu");
         initOptions();
         initPageEvent();
     })();
 
     function initOptions() {
-        initCollapse("#accordion", collapse_json.data);
+        initCollapse("#accordion", btnmenu_tab);
     }
     // $(".card>div>a").click(this,function(e){
     // 	alert(this.innerText);
@@ -27,6 +37,7 @@
     //$.fn.editable.defaults.mode = 'inline';
 
     function initCollapse(selector, params) {
+        if(!selector&&!params)return;
         for (var i = 0; i < params.length; i++) {
 
             var obj = new Object();
@@ -66,14 +77,13 @@
 						</div>`;
         return strCollapse;
     }
+    //table模板
     function getTable(obj) {//<div class="table-responsive">
-        var table = `<div>
-			<table id = "table_${obj.id}" class="table table-hover>
-				<thead class="thead-light">
-				</thead>
+        var table = `
+			<table id = "table_${obj.id}" class="table text-nowrap">
 			</table>
-            </div>
-            <div class="toolbar d-flex"  tableid='table_${obj.id}'>
+            
+            <div id="toolbar_${obj.id}" class="toolbar d-flex"  tableid='table_${obj.id}'>
 					<div class="btn-group btn-group-sm p-1" role="group" aria-label="left-group">
 						<button class="btn btn-secondary table-row-add">添加</button>
 						<button class="btn btn-light table-row-del">删除</button>
@@ -102,21 +112,24 @@
         return table;
     }
     function initTable(obj) {
-        var data = [{ "code": "1001", "id": "event_1", "selector": "#button", "event": "1", "params": "", "order": "test","selectormode":"1" }, { "code": "1002", "id": "event_2", "selector": "#btn2", "event": "2","selectormode":"2"  }];
+        var data = [];
+        data = getListByFiled(event_list, 'btnid', `collapse_${obj.id}`);
         $(`#table_${obj.id}`).bootstrapTable({
             //dataField: "data", // 接收数据json的默认键
-            data: event_list,
+            data: data,
             //pagination: false,
             //editable: true,
             clickToSelect: true,
-            height: 300,
-            //toolbar: ".toolbar",
+            //height: 300,
+            toolbar: `#toolbar_${obj.id}`,
+            rowStyle: setRowStyle,
             columns: [{
-                width: 10,
+                width: 38,
                 field: "box",
+                align: "center",
                 checkbox: true
             }, {
-                width: 10,
+                width: 30,
                 field: "index",
                 title: "#",
                 align: "center",
@@ -209,35 +222,60 @@
                     title: '年龄',
                 },
             }],
-            onEditableSave: function (field, row, oldValue, $el, a, b) {
-                alert(row.id);
-
+            onEditableSave: function (field, row, index, $el, a, b) {
+                //alert(index);
+                cell_select_position[`table_${obj.id}`] = $(`#table_${obj.id}`).bootstrapTable('getScrollPosition');
+                //$(`#table_${obj.id}`).bootstrapTable('scrollTo',{unit: 'rows', value: index});
             },
+            onEditableInit:function(){
+                //alert("editable init");
+                $(`#table_${obj.id}`).bootstrapTable('scrollTo',{unit: 'px', value: cell_select_position[`table_${obj.id}`] });
+                delete cell_select_position[`table_${obj.id}`];
+            }
         });
+        //$(`#table_${obj.id}`).bootstrapTable("resetWidth");
 
+    }
+    function setRowStyle(row, index) {
+        var style = {};
+        if (typeof(cell_start_index)==="number"&&typeof(cell_end_index)==="number"&&index >= cell_start_index &&index < cell_end_index ) {
+            //style={css:{'background-color':'#ed5565'}};
+            style={classes: 'bg-warning'};
+        }
+        //style={css:{'background-color':'#ed5565'}};
+        //style={ classes:'bg-warning'};
+        return {};
     }
     function initPageEvent(params) {
         var select_cell_index = 0;// 选中的行号
+        //选中一行
         $(`.table`).on('check.bs.table', function (table, row, target) {
             // ...
-            select_cell_index = target[0].dataset["index"];
+            select_cell_index = parseInt(target[0].dataset["index"]);
+            //alert(target[0].dataset["index"]);
+        });
+        //取消一行
+        $(`.table`).on('uncheck.bs.table', function (table, row, target) {
+            // ...
+            select_cell_index = null;
             //alert(target[0].dataset["index"]);
         });
          //添加按钮
         $(".table-row-add").click(function (params, a, b, c) {
+
             var tabid = params.target.parentElement.parentElement.getAttribute('tableid');
             console.log(tabid);
             var tab =  $(`#${tabid}`).bootstrapTable('getOptions');
             var tabcell_selected = $.map($(`#${tabid}`).bootstrapTable('getSelections'), function (row,a,b,c) {
                 return row.id;
-            })
+            })           
             var tab_show_length = tab.totalRows;
-
-            if(tabcell_selected.length>0){
-                $(`#${tabid}`).bootstrapTable('insertRow',{"index":select_cell_index, "row":{
-                    "name": "事件3",
-                    "id": "3",
-                    "btnid": "1",
+            //插入一行
+            function insertRow(index) {
+                $(`#${tabid}`).bootstrapTable('insertRow',{"index":index, "row":{
+                    "name": "描述",
+                    "id": getuuid(),
+                    "btnid": tabid.split("table_")[1],
                     "selectormode": "2",
                     "selector": "#id",
                     //"eventid": "1",
@@ -245,38 +283,87 @@
                     "code": "",
                     "order": 1
                 }});
-            }else{
-            $(`#${tabid}`).bootstrapTable('insertRow',{"index":tab_show_length, "row":{
-                "name": "事件3",
-                "id": "3",
-                "btnid": "1",
-                "selectormode": "2",
-                "selector": "#id",
-                "eventid": "1",
-                "params": "",
-                "code": "",
-                "order": 1
-            }});}
-            $(`#${tabid}`).bootstrapTable('refresh');
+            }
+            cell_click_times ++;
+            if(tabcell_selected.length>0){
+                //cell_start_index = select_cell_index ;
+                //cell_end_index = select_cell_index + cell_click_times;
+                insertRow(select_cell_index);              
+            }else{ 
+                //cell_start_index = tab_show_length - cell_click_times + 1;
+                //cell_end_index = tab_show_length + 1;
+                insertRow(tab_show_length);             
+            }
+            
+
+            var tab_want_height = 300;
+            var tab_height = $(`#${tabid}`).parents(".bootstrap-table").height();
+            if(tab_height&&tab_height >= tab_want_height){
+                $(`#${tabid}`).bootstrapTable('resetView',{height: tab_want_height});
+                
+                if(select_cell_index){
+                    //$(`#${tabid}`).bootstrapTable('scrollTo',{unit: 'rows', value: 1});
+                }else{
+                    $(`#${tabid}`).bootstrapTable('scrollTo','bottom');
+                }
+
+            }
 
         });
         //删除按钮
         $(".table-row-del").on('click', function (params, a, b, c) {
 
-            var a = params.target.parentElement.parentElement.getAttribute('tableid');
-            var b = $(`#${a}`).bootstrapTable('getSelections');
-            if (b) {
-                b.forEach(ele => {
-                    alert(ele.id);
-                });
+            var tabid = params.target.parentElement.parentElement.getAttribute('tableid');
+            //var select_item = $(`#${tabid}`).bootstrapTable('getSelections');
+            $table = $(`#${tabid}`);
+            var select_item = $.map($table.bootstrapTable('getSelections'), function (row) {
+                return row.id
+            })
+            
+            if (select_item.length > 0) {
+                // select_item.forEach(id => {
+                //     deleteChromeStorage('event_list', 'id', id);    
+                // });
 
+                //deleteChromeStorage2('event_list', 'id', select_item);    
+
+                $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: select_item
+                })
+                
+                
             } else {
                 alert("请选择");
             }
         });
+        //保存按钮
+        $(".table-row-save").on('click', function (params, a, b, c) {
 
+            var tabid = params.target.parentElement.parentElement.getAttribute('tableid');
+            $tabid = $(`#${tabid}`);
+            var tabdata= $tabid.bootstrapTable('getData');
+            if(!tabdata) return;
+            //alert(tabid);
+            saveTableData(tabid, tabdata);
+        });
     }
-   
+
+    function saveTableData(tableid, data) {
+        if(!data) return;
+        collapseid = tableid.split("table_")[1];
+        if (!data||data.length<1) {
+            deleteChromeStorage2('event_list', 'btnid', [`collapse_${collapseid}`]);
+            return;
+        }
+        for(var i = 0; i < data.length; i++){
+            data[i].box = false;
+        	data[i].order = i;
+            data[i].id.length<30||(data[i].id = getuuid());
+        	data[i].btnid = `collapse_${collapseid}`;
+        }
+        updateChromeStorageByField('event_list', data, 'btnid');
+    }
 
     function queryChromeStorage2(key, callback = null) {
 
@@ -292,5 +379,13 @@
         // var result = await query();
         // console.log("1111111111111111111111111111111111"+result);
         // console.log(2);
+    }
+
+    //获取唯一ID
+    function getuuid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
     }
 }

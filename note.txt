@@ -50,3 +50,18 @@ devtools js	只能访问 devtools、extension、runtime等部分API	可以		可以		不可以
 5. // notes: json字符串中变量作为key需要加[]，比如[key]:values;
 6. //自执行匿名函数，避免全局变量污染(function(){})(params);
 7. 字符串引用变量 `${var}` //新版版可用
+8. 判断变量不为空时，注意var等于0 if(var)错误，0==""为ture，0为false，""为false
+
+
+----bootstrap table----
+1. 设置列宽
+ .table {
+        table-layout: fixed !important;
+ 	}
+2. 设置表格宽度后隐藏超出部分用..表示
+ .table tbody tr td{
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+    }
+3. 

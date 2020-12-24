@@ -43,13 +43,16 @@ var default_tab = {
         },
         {
             "id": "2", "name": "生成教练信息", "order": 2
+        },
+        {
+            "id": "3", "name": "生成车辆信息", "order": 3
         }
     ],
     "event_list": [
         {
             "name": "事件1",
             "id": "1",
-            "btnid": "1",
+            "btnid": "collapse_1",
             "selectormode": "1",
             "selector": "#id",
             "eventid": "1",
@@ -59,8 +62,8 @@ var default_tab = {
         },
         {
             "name": "事件2",
-            "id": "2",
-            "btnid": "1",
+            "id": "1",
+            "btnid": "collapse_1",
             "selectormode": "2",
             "selector": "#id",
             "eventid": "1",

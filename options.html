@@ -28,13 +28,13 @@
 	<script src="https://unpkg.com/bootstrap-table@1.18.1/dist/extensions/editable/bootstrap-table-editable.min.js"></script>
 	<!-- <script src="js/background.js"></script> -->
 	<script src="js/options.js"></script>
-	
+    <script type="text/javascript" src="js/database.js"></script>
 
 </head>
 
 <body>
 
-	<div class="container-fluid" style="  position: fixed; height: 100%; overflow: auto;">
+	<div class="container-fluid" style="  position: fixed; height: 100%; overflow-y: auto;overflow-x: hidden;">
 		<h2>Flex</h2>
 		<p>使用 d-flex 类创建一个弹性盒子容器，并设置三个弹性子元素：</p>
 		<div class="d-flex flex-row justify-content-center bg-secondary" style="height: 100%;">
@@ -118,6 +118,11 @@
 	.collapse{
 		/* font-size: 12px; */
 	}
+    .table {
+        table-layout: fixed !important;/*固定列必设置*/
+        /* max-height:100px;
+        overflow:hidden; */
+    }
 </style>
 </body>
 
