@@ -27,7 +27,7 @@
 	<script src="https://cdn.jsdelivr.net/gh/Talv/x-editable@develop/dist/bootstrap4-editable/js/bootstrap-editable.min.js"></script>
 	<script src="https://unpkg.com/bootstrap-table@1.18.1/dist/extensions/editable/bootstrap-table-editable.min.js"></script>
 	<!-- <script src="js/background.js"></script> -->
-	<script src="js/options.js"></script>
+
     <script type="text/javascript" src="js/database.js"></script>
 
 </head>
@@ -65,7 +65,7 @@
 					<!-- <p><strong>注意:</strong> 使用 <strong>data-parent</strong>
 						属性来确保所有的折叠元素在指定的父元素下，这样就能实现在一个折叠选项显示时其他选项就隐藏。</p> -->
 					<p></p>
-					<div id="accordion">
+					<div id="accordion" class="accordion">
 						<div class="card">
 							<div class="card-header">
 								<a class="card-link" data-toggle="collapse" href="#collapseOne">
@@ -123,7 +123,18 @@
         /* max-height:100px;
         overflow:hidden; */
     }
+	.table tbody tr td{
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+    }
+	
+	textarea {
+	overflow: auto; 
+	resize: both;
+	}
 </style>
+<script src="js/options.js"></script>
 </body>
 
 </html>
