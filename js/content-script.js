@@ -95,7 +95,7 @@ function addFloatDiv(){
 	var bak_img2 = chrome.extension.getURL("/img/cute.gif");
 	var floatdivid = "#floatdiv";
 	$(floatdivid).remove();
-	$("body").append("<div id='floatdiv'style='z-index:999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px'><div style='height:100%;width:100%;'hidden=hidden><button id='testbtn1'>生成学员信息</button></div></div>");
+	$("body").append("<div id='floatdiv'style='z-index:999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px'><div style='height:100%;width:100%;font-size:10px;' hidden='hidden'><button id='testbtn1' style='height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\"Times New Roman\", Times, Serif;font-size:10px;'>生成学员信息</button></div></div>");
 	$(floatdivid).css({"background-image":"url(" + bak_img2 + ")", "background-color":"rgb(245, 245, 245)","border-radius":"8px"});
 	// 获取屏幕的高宽度
 	var cw = $(window).width();

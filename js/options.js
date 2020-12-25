@@ -12,7 +12,7 @@
     // 选中cell的位置，每个按钮表存一个，编辑后自动跳回原来位置
     var cell_select_position = {};
     // 全局变量
-    var tab_want_height = 300;
+    var tab_want_height = 300 + 52.75 + 39;
 
 
     var collapse_json = { data: [{ "id": "1", "name": "生成学员信息" }, { "id": "2", "name": "生成教练信息" }] };
@@ -82,7 +82,7 @@
     }
     //table模板
     function getTable(obj) {//<div class="table-responsive">
-        var table = `<div class="pb-5">
+        var table = `<div class="" style="height:${tab_want_height+20}px">
 
             <div id="toolbar_${obj.id}" class="toolbar d-flex"  tableid='table_${obj.id}'>
                 <div class="btn-group btn-group-sm p-1" role="group" aria-label="left-group">
@@ -95,10 +95,15 @@
                 </div>
 
             </div>
-			<table id = "table_${obj.id}" class="table text-nowrap" data-height="300" data-toolbar="toolbar_${obj.id}">
+            <table id = "table_${obj.id}" class="table text-nowrap">
+                <thead>
+                <tr>
+                <th data-field="id">ID</th>
+                <th data-field="name">Item Name</th>
+                <th data-field="price">Item Price</th>
+                </tr>
+                </thead>
             </table>
-            
-
             <div>
             `;
             //</div>
@@ -127,7 +132,7 @@
             //pagination: false,
             //editable: true,
             clickToSelect: true,
-            //height: 300,
+            //height: tab_want_height,
             toolbar: `#toolbar_${obj.id}`,
             rowStyle: setRowStyle,
             columns: [{
@@ -260,7 +265,7 @@
                 delete cell_select_position[`table_${obj.id}`];
             }
         });
-        setTableHeight(`table_${obj.id}`);
+        //setTableHeight(`table_${obj.id}`);
         //$(`#table_${obj.id}`).bootstrapTable("resetWidth");
 
     }
@@ -353,12 +358,13 @@
             }
             
 
-            var tab_want_height = 300;
+            //var tab_want_height = 300;
             var tab_height = $(`#${tabid}`).parents(".bootstrap-table").height();
-            $(`#${tabid}`).bootstrapTable('resetView',{height:300});
+            var toolbar_height = $(`#${tabid}`).parents(".bootstrap-table").height();
+            
             if(tab_height&&tab_height >= tab_want_height){
                 //$(`#${tabid}`).bootstrapTable('resetView',{height: tab_want_height});
-                
+                $(`#${tabid}`).bootstrapTable('resetView',{height:tab_want_height});
             }
             //傻了 知道tableid可以直接获取选中数量，未选中标记最后一行，选中标记前一行，不需要监控check.bs.table
             if(select_items.length > 0){
@@ -409,7 +415,7 @@
         $('#accordion').on('shown.bs.collapse',function (e,b,c,d,e) {
             // do something…
             //效果不好
-            //setTableHeight();
+            setTableHeight();
         });
 
     }
