@@ -31,7 +31,7 @@
 	[
 		{
 			"matches": ["<all_urls>"],
-			"js": ["js/jquery-1.8.3.min.js", "js/formatJson.js", "js/newStudent.js","js/content-script.js"],
+			"js": ["js/jquery-1.8.3.min.js", "js/formatJson.js", "js/newStudent.js", "js/ele_events.js", "js/content-script.js"],
 			"run_at": "document_start"
 		}
 	],

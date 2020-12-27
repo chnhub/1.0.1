@@ -4,28 +4,28 @@ var default_tab = {
             "id": "group1",
             "text": "元素事件",
             "children": [
-                {"value": 1, "text": "click", "description": ""},
-                {"value": 2, "text": "double_click", "description": ""},
-                {"value": 3, "text": "input", "description": ""},
-                {"value": 3, "text": "select", "description": ""},
+                {"value": 1, "text": "click", "func":"click", "description": ""},
+                {"value": 2, "text": "double_click", "func":"dbclick", "description": ""},
+                {"value": 3, "text": "input", "func":"val", "description": ""},
+                {"value": 4, "text": "select", "func":"", "description": ""},
             ]
         },
         {
             "id": "group2",
             "text": "自定义事件",
             "children": [
-                {"value": 1001, "text": "upload_img", "description": ""},
-                {"value": 1002, "text": "wait_time", "description": ""},
+                {"value": 1001, "text": "upload_img", "func":"", "description": ""},
+                {"value": 1002, "text": "wait_time", "func":"", "description": ""},
             ]
         },
         {
             "id": "group3",
             "text": "现成数据",
             "children": [
-                {"value": 2001, "text": "get_random_number", "description": ""},
-                {"value": 2002, "text": "get_idnum", "description": ""},
-                {"value": 2003, "text": "get_phone_number", "description": ""},
-                {"value": 2004, "text": "upload_img", "description": ""},
+                {"value": 2001, "text": "get_random_number", "func":"", "description": ""},
+                {"value": 2002, "text": "get_idnum", "func":"", "description": ""},
+                {"value": 2003, "text": "get_phone_number", "func":"", "description": ""},
+                {"value": 2004, "text": "upload_img", "func":"", "description": ""},
             ]
         }
     ],
@@ -34,7 +34,7 @@ var default_tab = {
             "value": "1", "text": "jquery", "order": 1
         },
         {
-            "value": "2", "text": "xpath", "order": 2
+            "value": "2", "text": "xpath", "func":"", "order": 2
         }
     ],
     "btnmenu": [

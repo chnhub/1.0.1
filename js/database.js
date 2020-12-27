@@ -123,7 +123,7 @@ function selectChromeStorageByField(tabname, field, field_value, callback){
 
 // 根据字段返回符合条件数组
 function getListByFiled(list, field, filed_value){
-    list_new = [];
+    var list_new = [];
     for (let i = 0; i < list.length; i++) {
         const element = list[i];
         if(filed_value === element[field]){
