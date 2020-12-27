@@ -94,7 +94,7 @@
 		var mousex = 0;
 		var mousey = 0;
 		$(floatdivid).remove();
-		$("body").append(`<div id='floatdiv'style='z-index:999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px'><div style='height:100%;width:100%;display:none;'><button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">生成学员信息</button></div></div>`);
+		$("body").append(`<div id='floatdiv'style='z-index:99999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px'><div style='height:100%;width:100%;display:none;'><button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">生成学员信息</button></div></div>`);
 		$(floatdivid).css({ "background-image": "url(" + bak_img2 + ")", "background-color": "rgb(245, 245, 245)", "border-radius": "8px" });
 		var tabname = "btnmenu";
 
@@ -154,7 +154,7 @@
 				console.log("现：", e.clientX, e.clientY);
 				if(Math.abs(e.clientX - mousex) < 5&&Math.abs(e.clientY - mousey) < 5) return;
 				if ($("#fullscreen-back-div").length === 0) {
-					$("body").append("<div id='fullscreen-back-div' style='z-index:9998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
+					$("body").append("<div id='fullscreen-back-div' style='z-index:99998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
 				}
 
 				//console.log(e.clientX ,e.clientY);
