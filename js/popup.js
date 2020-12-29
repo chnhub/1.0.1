@@ -33,8 +33,6 @@ var chromeStorageAddBtn = document.getElementById('chrome-storage-add');
         }
 
     }
-
-
 })();
 
 //var err = chrome.runtime.lastError;
@@ -42,7 +40,15 @@ var err = chrome.runtime.lastError;
 function callback1() {
     alert("test");
 }
-
+(function(){
+    var i = 0;
+    chromeStorageClearAllBtn.onclick = function(){
+        //clearChromeKeyStorage();
+        var user1 = {'name': '1', 'age': 18};
+        addDataToMainTab(i);
+        i++;
+    }
+})();
 addStudentInfoBtn.onclick = function(){
     console.log("----------------->生成学员信息");
     var studentinfo = new Object();
@@ -164,15 +170,12 @@ chromeStorageAddBtn.onclick = function(){
     var ip = '192.168.191.99';
     addDataToTabNoSameValue('allowInjectionIP', ip);
 };
-(function(){
-    var i = 0;
-    chromeStorageClearAllBtn.onclick = function(){
-        //clearChromeKeyStorage();
-        var user1 = {'name': '1', 'age': 18};
-        addDataToMainTab(i);
-        i++;
-    }
-})();
+//清除指定名称的表
+$("#btn_clear_onetab").click(function (e) {
+    var tabname = $("#tab_name_clear").val();
+    deleteChromeStorage(tabname);
+});
+
 //清除指定key数据
 chromeStorageClearKeyBtn.onclick = function(){
     //clearChromeKeyStorage('mainTable');
@@ -190,7 +193,28 @@ chromeStorageQueryBtn.onclick = function(){
     });
 };
 
+function deleteChromeStorage(tabname) {
+    if(!tabname)return "tablename不能为空";
+    // 从存储中读取数据
+    chrome.storage.sync.get(tabname, function(result) {
+        //console.log("需要清除的数据：" + tabname + JSON.stringify(result) + "：↓");
+        if(!result[tabname]){changeTips(tabname + "表不存在！","green");return;}        
+        console.log("需要清除的数据：" + "：↓");
+        console.log(result);
+        // sync 区域
+        chrome.storage.sync.remove(tabname, function(){
+            //do something
+            console.log(tabname + "已删除！");
+            changeTips(tabname + "内容已删除！","green");
+        });
+    });
 
+    // // sync 区域
+    // chrome.storage.sync.clear(function(){
+    //     //do something
+    //     console.log("sync区域所有数据已清除");
+    // });
+}
 
 
 // addStudentInfoBtn.onclick = function(){

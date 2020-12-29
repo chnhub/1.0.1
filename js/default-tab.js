@@ -45,8 +45,18 @@ var default_tab = {
             "id": "2", "name": "生成教练信息", "order": 2
         },
         {
-            "id": "3", "name": "生成车辆信息", "order": 3
+            "id": "3", "name": "生成驾校信息", "order": 3
+        },
+        {
+            "id": "4", "name": "生成车辆信息", "order": 4
+        },
+        {
+            "id": "5", "name": "生成考核员信息", "order": 5
+        },
+        {
+            "id": "6", "name": "生成安全员信息", "order": 6
         }
+
     ],
     "event_list": [
         {

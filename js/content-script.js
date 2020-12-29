@@ -2,6 +2,8 @@
 
 	var PROJECTIPTABLE = "allowInjectionIP";// 主表名
 	var CLICK_EVENT_TAB = [];// 事件表
+	var float_div_width = 100;
+	var float_div_height = 100;
 
 	//页面加载完毕后执行
 	document.addEventListener('DOMContentLoaded', function () {
@@ -94,7 +96,28 @@
 		var mousex = 0;
 		var mousey = 0;
 		$(floatdivid).remove();
-		$("body").append(`<div id='floatdiv'style='z-index:99999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px'><div style='height:100%;width:100%;display:none;'><button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">生成学员信息</button></div></div>`);
+		$("body").append(`
+			<div id='floatdiv'style='z-index:99999; height:${float_div_height}px;width:${float_div_width}px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px;'>
+
+					<div style="height:100%;width:100%;position: absolute;overflow: hidden;">
+						<div id="floatdiv_sub" style='height:100%;width:${float_div_width + 18}px;display:none;overflow-y: scroll;'>
+							<button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">
+							<span title="span的揭示信息">生成学员信息</span>
+							</button>
+						</div>
+					</div>
+			</div>`);
+			// <div id='floatdiv'style='z-index:99999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px;overflow-y:scroll;'>
+			// 	<div style=" height: 100%; width: 100%;position: relative;overflow: hidden;">
+			// 		<div style=" position: absolute;overflow-y: scroll;">
+			// 			<div id="floatdiv_sub" style='height:100%;width:100%;display:none;'>
+			// 				<button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">
+			// 					生成学员信息
+			// 				</button>
+			// 			</div>
+			// 		</div>
+			// 	</div>
+			// </div>
 		$(floatdivid).css({ "background-image": "url(" + bak_img2 + ")", "background-color": "rgb(245, 245, 245)", "border-radius": "8px" });
 		var tabname = "btnmenu";
 
@@ -105,8 +128,9 @@
 						result[tabname]&&(result = result[tabname]);
 						for (let i = 0; i < result.length; i++) {
 							const element = result[i];
-							//$(floatdivid + ">div").append(`<button id='conbtn_${element.id}' class="btnmenu" style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">${result[i]["name"]}</button>`);
-							$(floatdivid + ">div").append(`<button id='conbtn_${element.id}' class="btnmenu">${result[i]["name"]}</button>`);
+							//$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu" style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">${result[i]["name"]}</button>`);
+							//$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu"><span title="${result[i]["name"]}">${result[i]["name"]}</span></button>`);
+							$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu">${result[i]["name"]}</button>`);
 						}
 						resolve();
 					});
@@ -115,7 +139,8 @@
 			await wait(); //等待btnmenu数据查询完成
 			setBtnCss(".btnmenu");
 			$(".btnmenu").click(function(f){
-				var btnmenu_id = f.target.id.split("conbtn_")[1];
+				alert("dianjile ");
+				var btnmenu_id = f.currentTarget.id.split("conbtn_")[1];
 				console.log(btnmenu_id);
 				selectChromeStorageByField("event_list", "btnid", `collapse_${btnmenu_id}`, function (data) {
 					for (let i = 0; i < data.length; i++) {
@@ -146,7 +171,7 @@
 			//禁用点击事件12
 			$(document).mousemove(function (e) {
 
-				$(floatdivid + ">div>button").css({ "pointer-events": "none" });
+				$("#floatdiv_sub > button").css({ "pointer-events": "none" });
 				$("body").css({ "-moz-user-select": "none", "-webkit-user-select": "none", "user-select": "none" });
 				e = e || window.event;
 				var x = e.clientX - X;
@@ -172,22 +197,24 @@
 		});
 		// 鼠标抬起事件
 		$(document).mouseup(function () {
-			$(floatdivid + ">div>button").css({ "pointer-events": "" });
+			$("#floatdiv_sub > button").css({ "pointer-events": "" });
 			$("body").css({ "-moz-user-select": "", "-webkit-user-select": "", "user-select": "" });
 			$("#fullscreen-back-div").remove();
 			$(document).unbind("mousemove");
 
 		});
 		$(floatdivid).mouseenter(function () {
-			//$(floatdivid).css({"background-image":""});
-			//$(floatdivid + ">div").removeAttr("hidden");
+			$("#floatdiv_sub").css({"display":""});
+			
+			//$("#floatdiv_sub").removeAttr("hidden");
 			console.log("fadeIn");
-			$(floatdivid + ">div").stop(true,true).fadeIn();
+			//$("#floatdiv_sub").stop(true,true).fadeIn();
 		});
 		$(floatdivid).mouseleave(function () {
+			$("#floatdiv_sub").css({"display":"none"});
 			//$(floatdivid).css("background-image", "url(" + bak_img2 + ")");
-			//$(floatdivid + ">div").attr("hidden", "hidden");
-			$(floatdivid + ">div").stop(true,true).fadeOut();
+			//$("#floatdiv_sub").attr("hidden", "hidden");
+			//$("#floatdiv_sub").stop(true,true).fadeOut();
 		});
 
 		$("#testbtn1").click(function () {
@@ -219,7 +246,7 @@
 			var Y = e.clientY - $(floatdivid).offset().top + $(document).scrollTop();
 			//禁用点击事件12
 			$(document).mousemove(function (e) {
-				$(floatdivid + ">div>button").css({ "pointer-events": "none" });
+				$("#floatdiv_sub > button").css({ "pointer-events": "none" });
 				$("body").css({ "-moz-user-select": "none", "-webkit-user-select": "none", "user-select": "none" });
 				if ($("#fullscreen-back-div").length === 0) {
 					$("body").append("<div id='fullscreen-back-div' style='z-index:998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
@@ -241,7 +268,7 @@
 		});
 		// 鼠标抬起事件
 		$(document).mouseup(function () {
-			$(floatdivid + ">div>button").css({ "pointer-events": "" });
+			$("#floatdiv_sub > button").css({ "pointer-events": "" });
 			$("body").css({ "-moz-user-select": "", "-webkit-user-select": "", "user-select": "" });
 			$("#fullscreen-back-div").remove();
 			$(document).unbind("mousemove");
@@ -249,11 +276,11 @@
 		});
 		$(floatdivid).mouseover(function () {
 			//$(floatdivid).css({"background-image":""});
-			$(floatdivid + ">div").removeAttr("hidden");
+			$("#floatdiv_sub").removeAttr("hidden");
 		});
 		$(floatdivid).mouseout(function () {
 			$(floatdivid).css("background-image", "url(" + bak_img2 + ")");
-			$(floatdivid + ">div").attr("hidden", "hidden");
+			$("#floatdiv_sub").attr("hidden", "hidden");
 		});
 
 		$("#testbtn1").click(function () {

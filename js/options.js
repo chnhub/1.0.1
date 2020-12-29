@@ -81,8 +81,8 @@
         return strCollapse;
     }
     //table模板
-    function getTable(obj) {//<div class="table-responsive">
-        var table = `<div class="" style="height:${tab_want_height+20}px">
+    function getTable(obj) {//<div class="table-responsive" style="height:${tab_want_height+20}px">
+        var table = `<div class="" >
 
             <div id="toolbar_${obj.id}" class="toolbar d-flex"  tableid='table_${obj.id}'>
                 <div class="btn-group btn-group-sm p-1" role="group" aria-label="left-group">
@@ -131,7 +131,7 @@
             data: data,
             //pagination: false,
             //editable: true,
-            clickToSelect: true,
+            //clickToSelect: true,
             //height: tab_want_height,
             toolbar: `#toolbar_${obj.id}`,
             rowStyle: setRowStyle,
