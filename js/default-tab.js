@@ -8,6 +8,9 @@ var default_tab = {
                 {"value": 2, "text": "double_click", "func":"dbclick", "description": ""},
                 {"value": 3, "text": "input", "func":"val", "description": ""},
                 {"value": 4, "text": "select", "func":"", "description": ""},
+                {"value": 5, "text": "set_frame", "func":"setframe", "description": ""},
+                {"value": 6, "text": "focus", "func":"focus", "description": ""},
+                {"value": 7, "text": "blur", "func":"blur", "description": ""}
             ]
         },
         {
@@ -22,10 +25,10 @@ var default_tab = {
             "id": "group3",
             "text": "现成数据",
             "children": [
-                {"value": 2001, "text": "get_random_number", "func":"", "description": ""},
-                {"value": 2002, "text": "get_idnum", "func":"", "description": ""},
-                {"value": 2003, "text": "get_phone_number", "func":"", "description": ""},
-                {"value": 2004, "text": "upload_img", "func":"", "description": ""},
+                {"value": 2001, "text": "get_name", "func":"getStuName", "description": ""},
+                {"value": 2002, "text": "get_idnum", "func":"getIDNum", "description": ""},
+                {"value": 2003, "text": "get_phone_number", "func":"getTelPhone", "description": ""},
+                {"value": 2100, "text": "get_random_number", "func":"", "description": ""},
             ]
         }
     ],

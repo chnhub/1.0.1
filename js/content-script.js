@@ -143,12 +143,24 @@
 				var btnmenu_id = f.currentTarget.id.split("conbtn_")[1];
 				console.log(btnmenu_id);
 				selectChromeStorageByField("event_list", "btnid", `collapse_${btnmenu_id}`, function (data) {
+					var page_frame = null;
 					for (let i = 0; i < data.length; i++) {
 						const el = data[i];
+						if(parseInt(el["eventid"])==5) {page_frame = $(el["params"])[0].contentWindow.document;continue;};
 						CLICK_EVENT_TAB.forEach(e => {
-							if(parseInt(e["value"]) === parseInt(el["eventid"])){
-								ELE_EVENTS.base_events($(el.selector), e.func, el.params);
+							$ele = null;
+							//切换框架，仅支持两层框架嵌套
+							if(page_frame){
+								$ele = $(el.selector, page_frame);								
+							}else{
+								$ele = $(el.selector);
 							}
+							if(parseInt(e["value"]) === parseInt(el["eventid"])){	
+								//$ele.trigger("focus");						
+								ELE_EVENTS.base_events($ele, e.func, el.params);
+								//$ele.trigger("blur");
+							}
+							
 						});
 					}
 				});
