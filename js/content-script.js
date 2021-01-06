@@ -102,7 +102,7 @@
 					<div style="height:100%;width:100%;position: absolute;overflow: hidden;">
 						<div id="floatdiv_sub" style='height:100%;width:${float_div_width + 18}px;display:none;overflow-y: scroll;'>
 							<button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">
-							<span title="span的揭示信息">生成学员信息</span>
+								<span title="哈哈哈">生成学员信息</span>
 							</button>
 						</div>
 					</div>
@@ -130,7 +130,7 @@
 							const element = result[i];
 							//$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu" style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">${result[i]["name"]}</button>`);
 							//$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu"><span title="${result[i]["name"]}">${result[i]["name"]}</span></button>`);
-							$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu">${result[i]["name"]}</button>`);
+							$("#floatdiv_sub").append(`<button id='conbtn_${element.id}' class="btnmenu"><span title= "${result[i]["name"]}">${result[i]["name"]}</span></span></button>`);
 						}
 						resolve();
 					});
@@ -171,13 +171,14 @@
 			//禁用点击事件12
 			$(document).mousemove(function (e) {
 
-				$("#floatdiv_sub > button").css({ "pointer-events": "none" });
 				$("body").css({ "-moz-user-select": "none", "-webkit-user-select": "none", "user-select": "none" });
 				e = e || window.event;
 				var x = e.clientX - X;
 				var y = e.clientY - Y;
 				console.log("现：", e.clientX, e.clientY);
 				if(Math.abs(e.clientX - mousex) < 5&&Math.abs(e.clientY - mousey) < 5) return;
+				$("#floatdiv_sub > button").css({ "pointer-events": "none" });
+
 				if ($("#fullscreen-back-div").length === 0) {
 					$("body").append("<div id='fullscreen-back-div' style='z-index:99998;position: fixed;left: 0px; right: 0px;top: 0px;bottom: 0px;background-color:red;background-color:rgb(255, 255, 255, 0.5)';-moz-user-select:none;-webkit-user-select:none;user-select:none;></div>");
 				}
