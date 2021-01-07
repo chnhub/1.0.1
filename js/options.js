@@ -190,11 +190,17 @@
                 field: "selector",
                 title: "Selector",
                 align: "center",
+                formatter: function (value, row, index) {
+                    // /\"/g是替换全部
+                    var d = row.selector.replace(/\"/g, `&quot;`);// 双引号要替换
+                    //d = d.replace(/\'/g, `\\'`);
+                    return d;
+                },
                 editable: {
                     emptytext: "不能为空",
                     //mode: "inline",
                     // placement: 'top',
-                    type: 'text',
+                    type: 'textarea',
                     title: '选择器',
                     id: "selector",
                     placeholder: "元素的选择器",
@@ -246,13 +252,9 @@
 
             }, {
                 width: 150,
-                field: "order",
-                title: "Order",
+                field: "id",
+                title: "id",
                 align: "center",
-                editable: {
-                    type: 'text',
-                    title: '年龄',
-                },
             }],
             onEditableSave: function (field, row, index, $el, a, b) {
                 //alert(index);
@@ -336,7 +338,7 @@
                     "name": "描述",
                     "id": getuuid(),
                     "btnid": "collapse_" + tabid.split("table_")[1],
-                    "selectormode": "2",
+                    "selectormode": "1",
                     "selector": "#id",
                     "eventid": "1",
                     //"params": null,

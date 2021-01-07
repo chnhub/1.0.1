@@ -21,8 +21,9 @@ var ELE_EVENTS = ELE_EVENTS||{
      * @param {'Object'} $ele 变量
      * @param {string} events_name 变量能点出来的属性或函数
      * @param {string|Array} params 方法的参数，以数组形式表示function(params[0], params[1]...)
+     * @param {string} dec 描述
      */
-    base_events: function ($ele, events_name, params) {
+    base_events: function ($ele, events_name, params, row = []) {
         console.log("base_events被调用了");
         //this.test(1, 2);
         if(!events_name)return null;
@@ -39,6 +40,11 @@ var ELE_EVENTS = ELE_EVENTS||{
         //eve_ = `(${eve_})`;
         //console.log(eve_);
         if ($ele) {
+            if($ele.length<1){
+                console&&console.log("%c%s",
+                "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${$ele.selector})↓`,row);
+                return;
+            }
             var _eve = $ele;
             if(typeof($ele) == "function"){
                 //调用传入的方法 fun(p);
@@ -46,19 +52,40 @@ var ELE_EVENTS = ELE_EVENTS||{
             }else{
                  //调用对象的方法 object.fun(p);
                 script = `_eve.${eve}${eve_}`;
+                script = '';
+                for(var i = 0; i < _eve.length; i++){
                 switch (eve) {
                     case "val":
-                        script = `_eve.trigger("focus").${eve}${eve_}.trigger("blur")`;
+                        script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve_}.trigger("blur");`;
                         break;
+
+                    case "select":
+                        _eve.eq(i).find("option:selected").attr("selected", false);
+                        _eve.eq(i).find(`option:contains('${params}')`).attr("selected", true);
+                        //script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve_}.trigger("blur");`;
+                        if(_eve.find("option:selected").text() != params){
+                            _eve.eq(i).find(`option[value='${params}']`).attr("selected","selected");
+                        }
+                        break;
+
                     case "click": case "blur": case "focus": case "blur": case "change": case "dblclick": case "keydown": case "keyup": case "keyup": case "mousedown": case "mouseup":
-                        script = `_eve.trigger("${eve}")`;
+                        script = script + `_eve.eq(${i}).trigger("${eve}");`;
                         break;
-                    case "getStuName": case "getIDNum": case "getTelPhone": 
-                        script = `_eve.trigger("focus").val(this.${eve}${eve_}).trigger("blur")`;
+
+                    case "getStuName": case "getIDNum": case "getTelPhone": //默认全是输入
+                        var temp = `this.${eve}${eve_}`;
+                        if(i == 0){script = `_eve.val(this.${eve}${eve_});`}// 仅在第一次拼接赋值语句
+                        //script = script + `_eve.eq(${i}).trigger("focus").val(this.${eve}${eve_}).trigger("blur");`;
+                        script = script + `_eve.eq(${i}).trigger("focus").trigger("blur");`;
                         break;
+                    case "":
+                        
+                        break;
+
                     default:
-                        script = `_eve.${eve}${eve_}`;
+                        script = script + `_eve.eq(${i}).${eve}${eve_}`;
                         break;
+                }
                 }
             }
         }else {
@@ -118,7 +145,7 @@ var ELE_EVENTS = ELE_EVENTS||{
 				iSum += (Math.pow(2, i) % 11) * parseInt(this.sId.charAt(17 - i), 11);	
 			}
 			if (iSum % 11 == 1) {
-				console && console.log(this.sId +'   ////////   ' +j);
+				console && console.log(this.sId +'   ////idnum////   ' +j);
 				return this.sId;
 			}
 		}

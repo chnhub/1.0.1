@@ -139,25 +139,46 @@
 			await wait(); //等待btnmenu数据查询完成
 			setBtnCss(".btnmenu");
 			$(".btnmenu").click(function(f){
-				alert("dianjile ");
+				//alert("dianjile ");
 				var btnmenu_id = f.currentTarget.id.split("conbtn_")[1];
 				console.log(btnmenu_id);
 				selectChromeStorageByField("event_list", "btnid", `collapse_${btnmenu_id}`, function (data) {
 					var page_frame = null;
 					for (let i = 0; i < data.length; i++) {
 						const el = data[i];
-						if(parseInt(el["eventid"])==5) {page_frame = $(el["params"])[0].contentWindow.document;continue;};
-						CLICK_EVENT_TAB.forEach(e => {
-							$ele = null;
-							//切换框架，仅支持两层框架嵌套
-							if(page_frame){
-								$ele = $(el.selector, page_frame);								
-							}else{
-								$ele = $(el.selector);
+						//单独处理setframe
+						if(parseInt(el["eventid"])==5) {
+							if(!$(el.selector).length > 0){console&&console.log("%c%s",
+							"color: red; background: yellow;",`ERROR: [id:${el.id}][name:${el.name}]未定位到元素!(${el.selector})↓`, el);
+							alert(`未定位到frame：${el.selector}`);
+							return;
 							}
+							page_frame = $(el.selector)[0].contentWindow.document;
+							continue;
+						};
+						$ele = null;
+						//不同定位方式分别处理
+						switch (parseInt(el.selectormode)) {
+							case 2:
+								if (page_frame) {
+									$ele = $(document.evaluate(el.selector, page_frame).iterateNext());			
+								}else{
+									$ele = $(document.evaluate(el.selector, document).iterateNext());			
+								}
+								break;					
+							default:
+								//特殊处理：切换框架，仅支持两层框架嵌套
+								if(page_frame){
+									$ele = $(el.selector, page_frame);								
+								}else{
+									$ele = $(el.selector);
+								}
+								break;
+						}
+						CLICK_EVENT_TAB.forEach(e => {
 							if(parseInt(e["value"]) === parseInt(el["eventid"])){	
 								//$ele.trigger("focus");						
-								ELE_EVENTS.base_events($ele, e.func, el.params);
+								ELE_EVENTS.base_events($ele, e.func, el.params, el);
 								//$ele.trigger("blur");
 							}
 							
