@@ -339,7 +339,7 @@
                     "id": getuuid(),
                     "btnid": "collapse_" + tabid.split("table_")[1],
                     "selectormode": "1",
-                    "selector": "#id",
+                    "selector": "#",
                     "eventid": "1",
                     //"params": null,
                     //"code": "",

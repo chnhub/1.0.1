@@ -95,19 +95,18 @@
 		var ch = $(window).height();
 		var mousex = 0;
 		var mousey = 0;
-		$(floatdivid).remove();
-		$("body").append(`
-			<div id='floatdiv'style='z-index:99999; height:${float_div_height}px;width:${float_div_width}px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px;'>
+		var div_template = `
+		<div id='floatdiv'style='z-index:99999; height:${float_div_height}px;width:${float_div_width}px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px;'>
 
-					<div style="height:100%;width:100%;position: absolute;overflow: hidden;">
-						<div id="floatdiv_sub" style='height:100%;width:${float_div_width + 18}px;display:none;overflow-y: scroll;'>
-							<button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">
-								<span title="哈哈哈">生成学员信息</span>
-							</button>
-						</div>
+				<div style="height:100%;width:100%;position: absolute;overflow: hidden;">
+					<div id="floatdiv_sub" style='height:100%;width:${float_div_width + 18}px;display:none;overflow-y: scroll;'>
+						<button id='testbtn1' style="height:auto;width:80%;padding:0px 0px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-family:\'Times New Roman\', Times, Serif;font-size:5px;">
+							<span title="哈哈哈">生成学员信息</span>
+						</button>
 					</div>
-			</div>`);
-			// <div id='floatdiv'style='z-index:99999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px;overflow-y:scroll;'>
+				</div>
+		</div>`;
+		// <div id='floatdiv'style='z-index:99999; height:100px;width:100px;background-size:100% 100%;text-align: center;position: fixed; bottom:60px;right:10px;overflow-y:scroll;'>
 			// 	<div style=" height: 100%; width: 100%;position: relative;overflow: hidden;">
 			// 		<div style=" position: absolute;overflow-y: scroll;">
 			// 			<div id="floatdiv_sub" style='height:100%;width:100%;display:none;'>
@@ -118,9 +117,11 @@
 			// 		</div>
 			// 	</div>
 			// </div>
+		$(floatdivid).remove();
+		$("body").append(div_template);//添加div
 		$(floatdivid).css({ "background-image": "url(" + bak_img2 + ")", "background-color": "rgb(245, 245, 245)", "border-radius": "8px" });
 		var tabname = "btnmenu";
-
+		//等待查询完毕后添加按钮
 		async function addbtnmenu(tabname) {
 			function wait(){
 				return new Promise((resolve, reject) => { 
@@ -137,16 +138,19 @@
 				});
 			}
 			await wait(); //等待btnmenu数据查询完成
-			setBtnCss(".btnmenu");
-			$(".btnmenu").click(function(f){
-				//alert("dianjile ");
+			setBtnCss(".btnmenu"); //设置按钮样式
+			$(".btnmenu").click(function (f) {
+
 				var btnmenu_id = f.currentTarget.id.split("conbtn_")[1];
-				console.log(btnmenu_id);
+				console.log("btnmenu_id:",btnmenu_id);
 				selectChromeStorageByField("event_list", "btnid", `collapse_${btnmenu_id}`, function (data) {
-					var page_frame = null;
+					var page_frame = null;//需要特殊处理的连个事件
+					var wait_time = null;//设计的不行 后期cell中加个字段
 					for (let i = 0; i < data.length; i++) {
 						const el = data[i];
-						//单独处理setframe
+						$ele = null;
+						//单独处理setframe，先处理不同的事件
+						/*
 						if(parseInt(el["eventid"])==5) {
 							if(!$(el.selector).length > 0){console&&console.log("%c%s",
 							"color: red; background: yellow;",`ERROR: [id:${el.id}][name:${el.name}]未定位到元素!(${el.selector})↓`, el);
@@ -155,18 +159,36 @@
 							}
 							page_frame = $(el.selector)[0].contentWindow.document;
 							continue;
-						};
-						$ele = null;
+						};*/
+						console.log("事件：",i+1);
+						//单独处理setframe，先处理不同的事件
+						switch(parseInt(el["eventid"])){
+							case 5://setframe 要特殊处理
+								if(!$(el.selector).length > 0){
+									console&&console.log("%c%s",
+									"color: red; background: yellow;",`ERROR: [id:${el.id}][name:${el.name}]未定位到元素!(${el.selector})↓`, el);
+									alert(`未定位到frame：${el.selector}`);
+									return;
+								}
+								page_frame = $(el.selector)[0].contentWindow.document;
+								continue;
+							case 1002:// sleep函数特殊处理
+								wait_time = parseInt(el["params"]);
+								el.selectormode = 0;
+								//$ele = null;
+								continue;
+						}
+						
 						//不同定位方式分别处理
 						switch (parseInt(el.selectormode)) {
-							case 2:
+							case 2: //xpath
 								if (page_frame) {
 									$ele = $(document.evaluate(el.selector, page_frame).iterateNext());			
 								}else{
 									$ele = $(document.evaluate(el.selector, document).iterateNext());			
 								}
-								break;					
-							default:
+								break;				
+							case 1: //jquery
 								//特殊处理：切换框架，仅支持两层框架嵌套
 								if(page_frame){
 									$ele = $(el.selector, page_frame);								
@@ -175,17 +197,41 @@
 								}
 								break;
 						}
-						CLICK_EVENT_TAB.forEach(e => {
+						
+						CLICK_EVENT_TAB.some(e => {
 							if(parseInt(e["value"]) === parseInt(el["eventid"])){	
-								//$ele.trigger("focus");						
-								ELE_EVENTS.base_events($ele, e.func, el.params, el);
+								//$ele.trigger("focus");
+								switch (parseInt(e["value"])) {
+									case 100200:
+										//ELE_EVENTS.base_events($ele, e.func, i, el);
+										(function(i){
+											setTimeout(function(){
+												console.log("++++=+",i);
+											}, 0);
+										})(i);
+										break;
+								
+									default:
+										if(wait_time){											
+											ELE_EVENTS.base_events_wait(el.selector, page_frame, e.func, el.params, el, wait_time);
+										}else{
+											ELE_EVENTS.base_events($ele, e.func, el.params, el);
+										}
+										wait_time = null;
+										break;
+								}					
+								return true;
 								//$ele.trigger("blur");
 							}
 							
 						});
 					}
 				});
-			});
+
+				//alert("dianjile ");
+				
+			
+			}); //添加菜单按钮事件
 		}
 		addbtnmenu(tabname);// 必须用等待 异步查询数据完成
 		
@@ -197,7 +243,7 @@
 			e = e || window.event;
 			mousex = e.clientX;
 			mousey = e.clientY;
-			console.log("原：", mousex, mousey);
+			//console.log("原：", mousex, mousey);
 			// 获取鼠标在元素上的位置（鼠标按下时在元素上得位置）
 			var X = e.clientX - $(floatdivid).offset().left;
 			var Y = e.clientY - $(floatdivid).offset().top + $(document).scrollTop();
@@ -208,7 +254,7 @@
 				e = e || window.event;
 				var x = e.clientX - X;
 				var y = e.clientY - Y;
-				console.log("现：", e.clientX, e.clientY);
+				//console.log("现：", e.clientX, e.clientY);
 				if(Math.abs(e.clientX - mousex) < 5&&Math.abs(e.clientY - mousey) < 5) return;
 				$("#floatdiv_sub > button").css({ "pointer-events": "none" });
 
@@ -241,7 +287,7 @@
 			$("#floatdiv_sub").css({"display":""});
 			
 			//$("#floatdiv_sub").removeAttr("hidden");
-			console.log("fadeIn");
+			//console.log("fadeIn");
 			//$("#floatdiv_sub").stop(true,true).fadeIn();
 		});
 		$(floatdivid).mouseleave(function () {

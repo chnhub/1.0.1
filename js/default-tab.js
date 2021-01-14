@@ -10,15 +10,16 @@ var default_tab = {
                 {"value": 4, "text": "select", "func":"select", "description": ""},
                 {"value": 5, "text": "set_frame", "func":"setframe", "description": ""},
                 {"value": 6, "text": "focus", "func":"focus", "description": ""},
-                {"value": 7, "text": "blur", "func":"blur", "description": ""}
+                {"value": 7, "text": "blur", "func":"blur", "description": ""},
+                {"value": 8, "text": "checkbox", "func":"prop", "description": ""},
             ]
         },
         {
             "id": "group2",
             "text": "自定义事件",
             "children": [
-                {"value": 1001, "text": "upload_img", "func":"", "description": ""},
-                {"value": 1002, "text": "wait_time", "func":"", "description": ""},
+                {"value": 1001, "text": "upload_img", "func":"uploadImg", "description": ""},
+                {"value": 1002, "text": "wait_time", "func":"sleep", "description": ""},
             ]
         },
         {

@@ -30,6 +30,7 @@ var ELE_EVENTS = ELE_EVENTS||{
         var script = null;
         var eve = events_name; // 方法名字
         var eve_ = "";  //方法名后面的内容‘（）’
+        $ele = $($ele);
         if(params instanceof Array){
             for(var i = 0; i < params.length; i++){
                 eve_ = eve_ + `params[${i}]`;
@@ -40,7 +41,7 @@ var ELE_EVENTS = ELE_EVENTS||{
         //eve_ = `(${eve_})`;
         //console.log(eve_);
         if ($ele) {
-            if($ele.length<1){
+            if($ele.length<1&&params != "sleep"){
                 console&&console.log("%c%s",
                 "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${$ele.selector})↓`,row);
                 return;
@@ -78,8 +79,16 @@ var ELE_EVENTS = ELE_EVENTS||{
                         //script = script + `_eve.eq(${i}).trigger("focus").val(this.${eve}${eve_}).trigger("blur");`;
                         script = script + `_eve.eq(${i}).trigger("focus").trigger("blur");`;
                         break;
-                    case "":
-                        
+                    case "prop":
+                        if(!params)eve_=true;
+
+                        script = script + `_eve.eq(${i}).${eve}("checked",${eve_})`;
+                        break;
+                    case "sleep":
+                        script = script + `this.${eve}${eve_}`;
+                        break;
+                    case "uploadImg":
+                        script = script + `this.${eve}${eve_}`;
                         break;
 
                     default:
@@ -90,17 +99,54 @@ var ELE_EVENTS = ELE_EVENTS||{
             }
         }else {
             //调用本页面的方法 this.fun(p);
-            script = `${eve}${eve_}`;
+            script = `this.${eve}${eve_}`;// 应该加this.
         }
         console.log(script);
         var retu = eval(script);
         console.log("执行结果：",retu);
         return retu;
     },
+    base_events_xpath: function(xpath, iframe = document, events_name, params, row = []){
+        var $ele = $(document.evaluate(xpath, iframe).iterateNext());       
+        this.base_events($ele, events_name, params, row);
+    },
+    base_events_jquery: function($ele, iframe = document, events_name, params, row = []){      
+        this.base_events($($ele, iframe), events_name, params, row);
+    },
     test1: function(a, b){
         console.log(a, b)
     },
+    base_events_wait:function($ele, iframe, events_name, params, row = [], wait_time) {
+        console.log(`延迟${wait_time}秒调用`);
+        var obj = this;
+        setTimeout(function() {
+            switch (parseInt(row.selectormode)) {
+                case 2:
+                    obj.base_events_xpath($ele, iframe, events_name, params, row);
+                    break;
+            
+                default:
+                    obj.base_events($ele, events_name, params, row);
+                    break;
+            }
+            
+        }, wait_time * 1000);
+    },
+    //上传图片
+    uploadImg: function(imgpath){
 
+    },
+    //或者使用for循环
+    sleep: function(delay) {
+        console.log(`${delay}s前......`);
+        //for(var t = Date.now(); Date.now() - t <= delay*1000;);
+        (function(){
+            setTimeout(function() {
+                console.log(`${delay}s后......`);
+            }, delay * 1000);
+        })(delay);
+        
+    },
     /** 身份证有关 */
     getIDNum:function(){
 		return this.toId();

@@ -65,4 +65,4 @@ devtools js	只能访问 devtools、extension、runtime等部分API	可以		可�
         text-overflow:ellipsis;
         white-space: nowrap;
     }
-3. 
+3. 注意cell的数据带双引号需要转义

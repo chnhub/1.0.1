@@ -175,6 +175,13 @@ $("#btn_clear_onetab").click(function (e) {
     var tabname = $("#tab_name_clear").val();
     deleteChromeStorage(tabname);
 });
+//重新加载配置文件数据到指定名称的表
+$("#btn_reload_onetab").click(function (e) {
+    var tabname = $("#tab_name_clear").val();
+    var data = default_tab[tabname];
+    updateChromeStorage(tabname, data);
+});
+
 
 //清除指定key数据
 chromeStorageClearKeyBtn.onclick = function(){
