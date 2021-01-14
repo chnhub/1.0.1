@@ -132,10 +132,6 @@ var ELE_EVENTS = ELE_EVENTS||{
             
         }, wait_time * 1000);
     },
-    //上传图片
-    uploadImg: function(imgpath){
-
-    },
     //或者使用for循环
     sleep: function(delay) {
         console.log(`${delay}s前......`);
@@ -242,4 +238,88 @@ var ELE_EVENTS = ELE_EVENTS||{
 		return rdnum;
     },
     /** 学员有关 */
+    /** 图片有关 */
+    //上传图片
+    uploadImg: function(imgpath){
+        this.getImgBase64(imgpath, function(base64) {
+            if (!base64) return;
+            var imgobj = new Object();
+            imgobj.imgbase64 = base64;
+            imgobj.name = 'file1';
+            imgobj.filename = 'photo.jpg';
+            imgobj.urlprefix = '../../../photos/'; //服务器路径图片前缀
+            this.uploadimg(base64, function(data){
+			        $(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
+            });
+        });
+    },
+    getImgBase64: function(imgUrl, callback) {
+		window.URL = window.URL || window.webkitURL;
+		var xhr = new XMLHttpRequest();
+		xhr.open("get", imgUrl, true);
+		// 至关重要
+		xhr.responseType = "blob";
+		xhr.onload = function () {
+			if (this.status == 200) {
+				//得到一个blob对象
+				var blob = this.response;
+				console.log("blob", blob)
+				// 至关重要
+				var oFileReader = new FileReader();
+				oFileReader.onloadend = function (e) {
+					// 此处拿到的已经是 base64的图片了
+					var base64 = e.target.result;
+					callback && callback(base64);
+				};
+				oFileReader.readAsDataURL(blob);
+			}
+		}
+		xhr.send();
+    },
+    /**
+	 * 
+	 * @param {*} imgobj.imgbase64	- 图片base64格式 
+	 * @param {*} imgobj.name	- 上传文件的参数name值（一般为file1、file2...具体以后台为准） 
+	 * @param {*} imgobj.filename	- 上传文件的全名，后台解析用（例：photo.jpg）
+	 * @param {*} callback	- 回调函数，参数为...
+	 */
+	uploadimg: function(imgobj, callback) {
+		imgobj.name || (imgobj.name = 'file1');
+		imgobj.filename || (imgobj.filename = 'null.jpg');
+
+		var imgtype = imgobj.imgbase64.substring(imgobj.imgbase64.indexOf("image/") + 6, imgobj.imgbase64.indexOf(";"));
+		var data = atob(imgobj.imgbase64.split(',')[1]);
+		var ia = new Uint8Array(data.length);
+		for (let i = 0; i < data.length; i++) {
+			ia[i] = data.charCodeAt(i);
+		}
+		var blob = new Blob([ia], { type: 'image/' + imgtype });
+
+		var formdata = new FormData();
+		formdata.append(imgobj.name, blob, imgobj.filename);
+
+		$.ajax({
+			url: 'dfo/com_web/sys/Files/uploadPhotoHttp.do',
+			data: formdata,
+			type: "Post",
+			dataType: 'json',
+			async: true,
+			cache: false,//上传文件无需缓存
+			processData: false,//用于对data参数进行序列化处理 这里必须false
+			contentType: false, //必须
+			///去掉这个参数，服务器才能正常返回，否则返回997
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader('X-Requested-With', { toString: function () { return ''; } });
+			},
+			success: function (data) {
+				//console.log(data)
+				callback(data);
+			},
+			error: function (data) {
+				console.log(data)
+			}
+		});
+
+	}
+    /** 图片有关 */
 }
