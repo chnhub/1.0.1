@@ -133,6 +133,7 @@
             //editable: true,
             //clickToSelect: true,
             //height: tab_want_height,
+            undefinedText:"",
             toolbar: `#toolbar_${obj.id}`,
             rowStyle: setRowStyle,
             columns: [{
@@ -234,13 +235,15 @@
                 title: "Params",
                 align: "center",
                 editable: {
-                    //emptytext: "不能为空",
+                    //emptytext: "--",
                     //mode: "inline",
                     // placement: 'top',
                     type: 'textarea',
                     title: '参数',
                     id: "selector",
-                    placeholder: "元素的参数",
+                    placeholder: function(row){
+                        return "元素参数";
+                    },
                     pk: "selector"
                     //success: function(response, newValue) {  return true;}
                 }
@@ -308,6 +311,11 @@
     //初始化页面上的事件
     function initPageEvent(params) {
         var select_cell_index = 0;// 选中的行号
+        
+        //选中一行
+        $(`.table`).on('click-row.bs.table', function (event, row, $ele, dfield) {
+            
+        });
         //选中一行
         $(`.table`).on('check.bs.table', function (table, row, target) {
             // ...

@@ -59,9 +59,36 @@
         //alert("test1");
         console("浮动按钮被点击了!");
       });
+      $("#logbtn").click(function(){
+        log(null, "hello world");
+      });
+
     });
     decimalToFraction(1.2);
-
+    function log(color = info, data){
+        var numargs = arguments.length; // 获取实际被传递参数的数值。
+        var expargs = log.length; 
+        var clr = "black";
+        var bg = "white";
+        var script = "";
+        switch (color) {
+            case "error":
+                clr = "red";
+                bg = "yellow";
+                break;
+        
+            default:
+                break;
+        }
+        for (let i = 0; i < arguments.length; i++) {
+            if (i==0) continue;
+            const element = arguments[i];
+            script = script + `,arguments[${i}]`;
+        }
+        script = `console&&console.log("%c%s",
+                'color: ${clr}; background: ${bg};'${script});`
+        eval(script);
+    }
     function decimalToFraction(params) {
       if (params >= 1) {
         var yu = params % 1;
@@ -161,7 +188,7 @@
   <button id="active">激活 input 域的 select 事件</button>
   <button id="stop1">停止</button>
   <button id="testbtn">测试</button>
-
+  <button id="logbtn">打印</button>
 </body>
 
 </html>

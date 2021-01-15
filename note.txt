@@ -53,7 +53,7 @@ devtools js	只能访问 devtools、extension、runtime等部分API	可以		可�
 7. 字符串引用变量 `${var}` //新版版可用
 8. 判断变量不为空时，注意var等于0 if(var)错误，0==""为ture，0为false，""为false
 9. 注意同时访问一个数据，一个函数存在多个回调函数访问一个数据，会引发数据更新不及时等问题
-
+10.JSON.parse(str)转字符为数字
 ----bootstrap table----
 1. 设置列宽
  .table {

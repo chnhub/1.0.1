@@ -29,15 +29,22 @@ var ELE_EVENTS = ELE_EVENTS||{
         if(!events_name)return null;
         var script = null;
         var eve = events_name; // 方法名字
-        var eve_ = "";  //方法名后面的内容‘（）’
-        $ele = $($ele);
+        var eve_ = "";  //方法参数不带括号()
+        var eve__ = "";  //方法参数带括号()
+        $ele&&($ele = $($ele)); //以防万一再包一层jquery
+        //多个参数时进行切割
+        if(params&&(typeof(params)==="string")&&params.split(",")!=-1){
+            params = params.split(",");
+        }
+        //数组参数处理
         if(params instanceof Array){
             for(var i = 0; i < params.length; i++){
                 eve_ = eve_ + `params[${i}]`;
                 i!=params.length - 1&&(eve_ = eve_ + ',');
             }
         }else{ eve_ = "params" }
-        eve_?eve_ = `(${eve_})`:eve_ = `()`;//判断是否有参数
+        eve__ = eve_;
+        eve__?eve__ = `(${eve__})`:eve__ = `()`;//判断是否有参数
         //eve_ = `(${eve_})`;
         //console.log(eve_);
         if ($ele) {
@@ -49,15 +56,15 @@ var ELE_EVENTS = ELE_EVENTS||{
             var _eve = $ele;
             if(typeof($ele) == "function"){
                 //调用传入的方法 fun(p);
-                script = `_eve${eve_}`;
+                script = `_eve${eve__}`;
             }else{
                  //调用对象的方法 object.fun(p);
-                script = `_eve.${eve}${eve_}`;
+                script = `_eve.${eve}${eve__}`;
                 script = '';
                 for(var i = 0; i < _eve.length; i++){
                 switch (eve) {
                     case "val":
-                        script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve_}.trigger("blur");`;
+                        script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve__}.trigger("blur");`;
                         break;
 
                     case "select":
@@ -74,32 +81,31 @@ var ELE_EVENTS = ELE_EVENTS||{
                         break;
 
                     case "getStuName": case "getIDNum": case "getTelPhone": //默认全是输入
-                        var temp = `this.${eve}${eve_}`;
-                        if(i == 0){script = `_eve.val(this.${eve}${eve_});`}// 仅在第一次拼接赋值语句
+                        var temp = `this.${eve}${eve__}`;
+                        if(i == 0){script = `_eve.val(this.${eve}${eve__});`}// 仅在第一次拼接赋值语句
                         //script = script + `_eve.eq(${i}).trigger("focus").val(this.${eve}${eve_}).trigger("blur");`;
                         script = script + `_eve.eq(${i}).trigger("focus").trigger("blur");`;
                         break;
-                    case "prop":
+                    case "checkbox":
                         if(!params)eve_=true;
-
-                        script = script + `_eve.eq(${i}).${eve}("checked",${eve_})`;
+                        script = script + `_eve.eq(${i}).prop("checked",JSON.parse(${eve_}))`;
                         break;
                     case "sleep":
-                        script = script + `this.${eve}${eve_}`;
+                        script = script + `this.${eve}${eve__}`;
                         break;
                     case "uploadImg":
-                        script = script + `this.${eve}${eve_}`;
+                        script = script + `this.${eve}(${eve_},_eve.eq(${i}))`;
                         break;
 
                     default:
-                        script = script + `_eve.eq(${i}).${eve}${eve_}`;
+                        script = script + `_eve.eq(${i}).${eve}${eve__}`;
                         break;
                 }
                 }
             }
         }else {
             //调用本页面的方法 this.fun(p);
-            script = `this.${eve}${eve_}`;// 应该加this.
+            script = `this.${eve}${eve__}`;// 应该加this.
         }
         console.log(script);
         var retu = eval(script);
@@ -198,21 +204,22 @@ var ELE_EVENTS = ELE_EVENTS||{
 	 * 
 	 * @param {*} areacodePath 标题的jquery选择器
 	 */
-	getStuName:function(areacodePath, default_before_name = "测试学员"){
+	getStuName:function(default_before_name = "测试"){
 		var htmltitle = document.title;
 		//htmltitle?htmltitle = htmltitle.split("市")[0].length>1?htmltitle=htmltitle.split("市")[0]+"学员":"测试学员":"测试学员";
 		//生成学员姓名
 		var htmltitle = $(".header_l").text();
-	
 		if(htmltitle&&htmltitle.indexOf("市")>=0&&htmltitle.indexOf("省")>=0){
 			htmltitle = htmltitle.substring(htmltitle.indexOf("省")+1, htmltitle.indexOf("市")) + "学员";
-		}else {
-			htmltitle = default_before_name;
+        }else if(htmltitle&&htmltitle.indexOf("市")>=0){
+            htmltitle = htmltitle.substring(0, htmltitle.indexOf("市"));
+        }else  {
+			htmltitle = "";
 		}
 
 		var gtime = parseInt((new Date() - 0)/1000);
 		gtime = gtime - parseInt(gtime/10000)*10000;
-		return htmltitle + ("00000000"+gtime).substr(-4);
+		return htmltitle + default_before_name + ("00000000"+gtime).substr(-4);
 	},
 	getAreaCode:function(areacodePath){
 
@@ -233,48 +240,68 @@ var ELE_EVENTS = ELE_EVENTS||{
         var gtime = parseInt((new Date() - 0)/Math.pow(10,len));
 		return gtime;
     },
-    getRDNum:function(len = 1){
+    getRDNum:function(len = 1, pre = null, suffix = null){
         var rdnum = Math.round(Math.random()*(Math.pow(10,len)));
-		return rdnum;
+		return pre + rdnum + suffix;
     },
     /** 学员有关 */
     /** 图片有关 */
     //上传图片
-    uploadImg: function(imgpath){
-        this.getImgBase64(imgpath, function(base64) {
+    uploadImg: function(imgpath, uploadpath, urlprefix, ele){
+        var obj = this;
+        var ele_img = arguments[arguments.length-1];
+        var imgph =  this.getImgBase64(imgpath, function(base64) {
             if (!base64) return;
             var imgobj = new Object();
+            imgobj.ele = ele;
             imgobj.imgbase64 = base64;
             imgobj.name = 'file1';
             imgobj.filename = 'photo.jpg';
             imgobj.urlprefix = '../../../photos/'; //服务器路径图片前缀
-            this.uploadimg(base64, function(data){
-			        $(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
+            urlprefix&&(imgobj.urlprefix = urlprefix);
+            imgobj.uploadpath = uploadpath;
+            obj.uploadimg(imgobj, function(data){
+                    //$(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
+                    imgobj.ele&&$(imgobj.ele).attr("src", imgobj.urlprefix + '/' + data.path);
+                    ELE_EVENTS.log(null,JSON.stringify(data));
             });
         });
+        return `图片路径：${imgph}  上传地址：${uploadpath}`;
     },
     getImgBase64: function(imgUrl, callback) {
-		window.URL = window.URL || window.webkitURL;
-		var xhr = new XMLHttpRequest();
-		xhr.open("get", imgUrl, true);
-		// 至关重要
-		xhr.responseType = "blob";
-		xhr.onload = function () {
-			if (this.status == 200) {
-				//得到一个blob对象
-				var blob = this.response;
-				console.log("blob", blob)
-				// 至关重要
-				var oFileReader = new FileReader();
-				oFileReader.onloadend = function (e) {
-					// 此处拿到的已经是 base64的图片了
-					var base64 = e.target.result;
-					callback && callback(base64);
-				};
-				oFileReader.readAsDataURL(blob);
-			}
-		}
-		xhr.send();
+       
+        if(!imgUrl)imgUrl = "stu";
+        var reg = "^([hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://)(([A-Za-z0-9-~]+).)+([A-Za-z0-9-~\\/])+$";
+        var re = new RegExp(reg);
+        //未填写路径拿本地图片
+        if (!re.test(imgUrl)){   
+            if (imgUrl.toLowerCase().indexOf("stu") != -1) imgUrl = "/img/stu.jpg";
+            else if (imgUrl.toLowerCase().indexOf("coa") != -1) imgUrl = "/img/coa.jpg";
+            else imgUrl = "/img/stu.jpg";
+            imgUrl = chrome.extension.getURL(imgUrl);
+        }
+        window.URL = window.URL || window.webkitURL;
+        var xhr = new XMLHttpRequest();
+        xhr.open("get", imgUrl, true);
+        // 至关重要
+        xhr.responseType = "blob";
+        xhr.onload = function () {
+            if (this.status == 200) {
+                //得到一个blob对象
+                var blob = this.response;
+                //console.log("blob", blob)
+                // 至关重要
+                var oFileReader = new FileReader();
+                oFileReader.onloadend = function (e) {
+                    // 此处拿到的已经是 base64的图片了
+                    var base64 = e.target.result;
+                    callback && callback(base64);
+                };
+                oFileReader.readAsDataURL(blob);
+            }
+        }
+        xhr.send();
+        return imgUrl;
     },
     /**
 	 * 
@@ -299,7 +326,8 @@ var ELE_EVENTS = ELE_EVENTS||{
 		formdata.append(imgobj.name, blob, imgobj.filename);
 
 		$.ajax({
-			url: 'dfo/com_web/sys/Files/uploadPhotoHttp.do',
+           // url: 'dfo/com_web/sys/Files/uploadPhotoHttp.do',
+            url: imgobj.uploadpath,
 			data: formdata,
 			type: "Post",
 			dataType: 'json',
@@ -320,6 +348,30 @@ var ELE_EVENTS = ELE_EVENTS||{
 			}
 		});
 
-	}
+	},
     /** 图片有关 */
+    log: function(color = "info", data){
+        var numargs = arguments.length; // 获取实际被传递参数的数值。
+        var expargs = this.log.length; // 期望传的参数个数
+        var clr = "black";
+        var bg = "white";
+        var script = "";
+        switch (color) {
+            case "error":
+                clr = "red";
+                bg = "yellow";
+                break;
+
+            default:
+                break;
+        }
+        for (let i = 0; i < arguments.length; i++) {
+            if (i==0) continue;
+            const element = arguments[i];
+            script = script + `,arguments[${i}]`;
+        }
+        script = `console&&console.log("%c%s",
+                'color: ${clr}; background: ${bg};'${script});`
+        eval(script);
+    }
 }

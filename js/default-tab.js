@@ -11,7 +11,9 @@ var default_tab = {
                 {"value": 5, "text": "set_frame", "func":"setframe", "description": ""},
                 {"value": 6, "text": "focus", "func":"focus", "description": ""},
                 {"value": 7, "text": "blur", "func":"blur", "description": ""},
-                {"value": 8, "text": "checkbox", "func":"prop", "description": ""},
+                {"value": 8, "text": "checkbox", "func":"checkbox", "description": ""},
+                {"value": 21, "text": "attr", "func":"attr", "description": ""},
+                {"value": 22, "text": "prop", "func":"prop", "description": ""},
             ]
         },
         {
@@ -29,7 +31,7 @@ var default_tab = {
                 {"value": 2001, "text": "get_name", "func":"getStuName", "description": ""},
                 {"value": 2002, "text": "get_idnum", "func":"getIDNum", "description": ""},
                 {"value": 2003, "text": "get_phone_number", "func":"getTelPhone", "description": ""},
-                {"value": 2100, "text": "get_random_number", "func":"", "description": ""},
+                {"value": 2100, "text": "get_random_number", "func":"getRDNum", "description": ""},
             ]
         }
     ],

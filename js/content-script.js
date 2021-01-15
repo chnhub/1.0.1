@@ -160,7 +160,8 @@
 							page_frame = $(el.selector)[0].contentWindow.document;
 							continue;
 						};*/
-						console.log("事件：",i+1);
+						console.log("事件：",i+1, el.name);
+						if (!el.selector||el.selector === "#") el.selectormode = 0;
 						//单独处理setframe，先处理不同的事件
 						switch(parseInt(el["eventid"])){
 							case 5://setframe 要特殊处理
@@ -177,6 +178,10 @@
 								el.selectormode = 0;
 								//$ele = null;
 								continue;
+							// case 1001:// uploadimg函数特殊处理
+							// 	el.selectormode = 0;
+							// 	//$ele = null;
+							// 	break;
 						}
 						
 						//不同定位方式分别处理
@@ -217,14 +222,15 @@
 										}else{
 											ELE_EVENTS.base_events($ele, e.func, el.params, el);
 										}
-										wait_time = null;
+										
 										break;
-								}					
+								}
+											
 								return true;
 								//$ele.trigger("blur");
 							}
-							
 						});
+						wait_time = null;	//一次循环结束清空定时
 					}
 				});
 
