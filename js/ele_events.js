@@ -50,7 +50,7 @@ var ELE_EVENTS = ELE_EVENTS||{
         if ($ele) {
             if($ele.length<1&&params != "sleep"){
                 console&&console.log("%c%s",
-                "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${$ele.selector})↓`,row);
+                "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${row.selector})↓`,row);
                 return;
             }
             var _eve = $ele;
@@ -71,9 +71,11 @@ var ELE_EVENTS = ELE_EVENTS||{
                         _eve.eq(i).find("option:selected").attr("selected", false);
                         _eve.eq(i).find(`option:contains('${params}')`).attr("selected", true);
                         //script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve_}.trigger("blur");`;
-                        if(_eve.find("option:selected").text() != params){
+                        if(_eve.eq(i).find("option:selected").text() != params && _eve.eq(i).val() != params){
                             _eve.eq(i).find(`option[value='${params}']`).attr("selected","selected");
                         }
+                        //优化 判断select的text和value都与参数不同时，则表示未找到改select
+                        if(_eve.eq(i).find("option:selected").text() != params && _eve.eq(i).val() != params){this.log("error",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${row.selector})↓`,row)}
                         break;
 
                     case "click": case "blur": case "focus": case "blur": case "change": case "dblclick": case "keydown": case "keyup": case "keyup": case "mousedown": case "mouseup":
@@ -94,7 +96,14 @@ var ELE_EVENTS = ELE_EVENTS||{
                         script = script + `this.${eve}${eve__}`;
                         break;
                     case "uploadImg":
-                        script = script + `this.${eve}(${eve_},_eve.eq(${i}))`;
+                        var  img = new Object();                   
+                        img.imgpath = params[0]; 
+                        img.uploadpath = params[1];
+                        img.urlprefix = params[2];
+                        img.field = params[3];
+                        img.ele = _eve.eq(i);
+                        //script = script + `this.${eve}(${eve_},_eve.eq(${i}))`;
+                        script = script + `this.${eve}(img)`;
                         break;
 
                     default:
@@ -122,21 +131,39 @@ var ELE_EVENTS = ELE_EVENTS||{
     test1: function(a, b){
         console.log(a, b)
     },
-    base_events_wait:function($ele, iframe, events_name, params, row = [], wait_time) {
+    base_events_wait:function($ele, iframe, events_name, params, row = [], wait_time = 3) {
         console.log(`延迟${wait_time}秒调用`);
         var obj = this;
-        setTimeout(function() {
-            switch (parseInt(row.selectormode)) {
-                case 2:
-                    obj.base_events_xpath($ele, iframe, events_name, params, row);
-                    break;
-            
-                default:
-                    obj.base_events($ele, events_name, params, row);
-                    break;
-            }
-            
-        }, wait_time * 1000);
+        var $el = null;
+        if(wait_time.indexOf(",")!=-1){
+            var p = wait_time.split(",");
+            this.recordTime(function(timer){
+                switch (parseInt(row.selectormode)) {
+                    case 2:
+                        $el = $(document.evaluate($ele, iframe).iterateNext()); 
+                        break;            
+                    default:
+                        $el = $ele; 
+                        break;
+                }
+                if ($el.length < 0) return;
+                obj.base_events($el, events_name, params, row);
+                clearInterval(timer);
+            }, parseInt(p[0]), parseInt(p[1])||300);
+        }else {
+            setTimeout(function() {
+                switch (parseInt(row.selectormode)) {
+                    case 2:
+                        obj.base_events_xpath($ele, iframe, events_name, params, row);
+                        break;
+                
+                    default:
+                        obj.base_events($ele, events_name, params, row);
+                        break;
+                }
+                
+            }, parseInt(wait_time)||3 * 1000);
+        }
     },
     //或者使用for循环
     sleep: function(delay) {
@@ -246,27 +273,35 @@ var ELE_EVENTS = ELE_EVENTS||{
     },
     /** 学员有关 */
     /** 图片有关 */
-    //上传图片
-    uploadImg: function(imgpath, uploadpath, urlprefix, ele){
+    //上传图片 imgpath, uploadpath, urlprefix, field, ele)
+    uploadImg: function(img){
         var obj = this;
         var ele_img = arguments[arguments.length-1];
-        var imgph =  this.getImgBase64(imgpath, function(base64) {
+        var imgph =  this.getImgBase64(img.imgpath, function(base64) {
             if (!base64) return;
             var imgobj = new Object();
-            imgobj.ele = ele;
+            imgobj.ele = img.ele;
             imgobj.imgbase64 = base64;
             imgobj.name = 'file1';
             imgobj.filename = 'photo.jpg';
             imgobj.urlprefix = '../../../photos/'; //服务器路径图片前缀
-            urlprefix&&(imgobj.urlprefix = urlprefix);
-            imgobj.uploadpath = uploadpath;
+            imgobj.field = "path";// 上传接口返回的json的字段
+            imgobj.uploadpath = "dfo/com_web/sys/Files/uploadPhotoHttp.do";//默认上传地址
+            img.urlprefix&&(imgobj.urlprefix = img.urlprefix);
+            img.field&&(imgobj.field = img.field);
+            img.uploadpath&&(imgobj.uploadpath = img.uploadpath);
             obj.uploadimg(imgobj, function(data){
                     //$(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
-                    imgobj.ele&&$(imgobj.ele).attr("src", imgobj.urlprefix + '/' + data.path);
+                    var script = `data.${imgobj.field}`;
+                    var retu = eval(script);
+                    retu = imgobj.urlprefix + '/' + retu;
                     ELE_EVENTS.log(null,JSON.stringify(data));
+                    console.log("处理后imgurl：", retu);
+                    imgobj.ele&&$(imgobj.ele).attr("src", retu);
+                    
             });
         });
-        return `图片路径：${imgph}  上传地址：${uploadpath}`;
+        return `图片路径：${imgph}  上传地址：${img.uploadpath}`;
     },
     getImgBase64: function(imgUrl, callback) {
        
@@ -350,6 +385,19 @@ var ELE_EVENTS = ELE_EVENTS||{
 
 	},
     /** 图片有关 */
+    /** 定时执行，time秒内每once毫秒内执行一次回调函数 */
+    recordTime: function(callbak, time = 3, once = 300) {
+        if(typeof(time)!="number") return;
+        var i = 0;
+        var times = once;
+        var timefun = setInterval(test, times);
+        function test() {   
+          i=i+times;       
+          if (i > time * 1000) {clearInterval(timefun); return};
+          //console.log(time+i); 
+          callbak(timefun, time * 1000 - i, );
+        }
+    },
     log: function(color = "info", data){
         var numargs = arguments.length; // 获取实际被传递参数的数值。
         var expargs = this.log.length; // 期望传的参数个数

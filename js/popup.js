@@ -1,6 +1,11 @@
-
+// 全局表
 var PROJECTMAINTABLE = "mainTable";
 var PROJECTIPTABLE = "allowInjectionIP";
+var click_event_tab = "click_event_tab";
+var selector_mode = "selector_mode";
+var btnmenu = "btnmenu";
+var event_list = "event_list";
+///
 var CHROMELASTERROR = chrome.runtime.lastError;
 //全局变量尽量少用，后期处理
 var changeColorBtn = document.getElementById('change-color');
@@ -183,12 +188,19 @@ $("#btn_reload_onetab").click(function (e) {
 });
 
 
-//清除指定key数据
-chromeStorageClearKeyBtn.onclick = function(){
-    //clearChromeKeyStorage('mainTable');
-    clearChromeKeyStorage();
-    addChromeKeyStorage(PROJECTMAINTABLE, new Array());
-    addChromeKeyStorage("allowInjectionIP", []);
+//双击重置一部分表
+chromeStorageClearKeyBtn.ondblclick = function(){
+    //clearChromeKeyStorage();
+    //addChromeKeyStorage(PROJECTMAINTABLE, new Array());
+    //addChromeKeyStorage("allowInjectionIP", []);
+    // settingConfigInit(PROJECT_MAIN_TABLE);
+    // settingConfigInit("allowInjectionIP");
+    // initTab();
+    updateChromeStorage(click_event_tab, default_tab[click_event_tab]);
+    updateChromeStorage(selector_mode, default_tab[selector_mode]);
+    updateChromeStorage(btnmenu, default_tab[btnmenu]);
+    updateChromeStorage(event_list, default_tab[event_list]);
+    
 };
 //查询
 chromeStorageQueryBtn.onclick = function(){

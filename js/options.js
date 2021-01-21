@@ -314,7 +314,9 @@
         
         //选中一行
         $(`.table`).on('click-row.bs.table', function (event, row, $ele, dfield) {
-            
+            $ele = $("#right_tips_div");
+            $ele.children("p").html(dfield);
+            rightTips(row.eventid, dfield);
         });
         //选中一行
         $(`.table`).on('check.bs.table', function (table, row, target) {
@@ -429,6 +431,14 @@
         });
 
     }
+    //右侧div提示内容
+    function rightTips(eveid, data) {
+        $ele = $("#right_tips_div");
+        var list = selectChromeStorage2(click_event_tab, "children");
+        list = getListByFiled(list, "value", parseInt(eveid));
+        $ele.children("p").html(list[0].description);
+        //$ele.html(list[0].description);
+    }
     //保存表的数据根据每个按钮
     function saveTableData(tableid, data) {
         if(!data) return;
@@ -442,7 +452,7 @@
         for(var i = 0; i < data.length; i++){
             data[i].box = false;
         	data[i].order = i;
-            data[i].id.length<30||(data[i].id = getuuid());
+            data[i].id.length<30&&(data[i].id = getuuid());// 之前是或逻辑 现在改成与
             data[i].btnid = `collapse_${collapseid}`;
         }
         updateChromeStorageByField('event_list', data, 'btnid');

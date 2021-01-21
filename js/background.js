@@ -8,8 +8,7 @@ var Tab = null;
 (function () {
     //页面初始化调用
     (function () {
-        settingConfigInit(PROJECT_MAIN_TABLE);
-        settingConfigInit("allowInjectionIP");
+
         initTab();
         //insertFloatDiv();
         
@@ -117,6 +116,8 @@ function delClickEventTab(tabname, data){
     });
 }
 function initTab(){
+    settingConfigInit(PROJECT_MAIN_TABLE);
+    settingConfigInit("allowInjectionIP");
     initTabByName("click_event_tab");
     initTabByName("selector_mode");
     initTabByName("event_list");

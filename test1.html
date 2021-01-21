@@ -27,7 +27,8 @@
         //ELE_EVENTS.base_events($("#FirstName"), "val", ["hah", "test"]);
         var p = new Object();
         p.stu = "hah1";
-        ELE_EVENTS.base_events(null, "this.test1", ["hah", getvar()]);
+       // ELE_EVENTS.base_events(null, "this.test1", ["hah", getvar()]);
+       funyibu();
 
       });
       var t, m;
@@ -108,18 +109,19 @@
 
     console.log(ID.init());
 
-    function recordTime(callbak, time = 2) {
+    function recordTime(callbak, time = 3, once = 1000) {
       if(typeof(time)!="number") return;
       var i = 0;
-      var times = 300;
-      function test() {         
-        if (i >= time) {clearInterval(timefun); return};
-
-        //console.log(time+i); 
-        callbak(time - i);
-        i=(i*1000+times)/1000;
-      }
+      var times = once;
       var timefun = setInterval(test, times);
+      function test() {   
+        i=i+times;       
+        if (i > time * 1000) {clearInterval(timefun); return};
+        //console.log(time+i); 
+        callbak(time * 1000 - i, timefun);
+        
+      }
+      
     }
     function recordTime2(callbak, time = 2) {
       if(typeof(time)!="number") return;
@@ -144,8 +146,8 @@
       var endDate=new Date(); 
       endTime=endDate.getTime(); 
       console.log(endTime-startTime);*/// 计算代码执行时间
-      recordTime(function(time){
-
+      recordTime(function(time, timer){
+        if(parseInt(time) < 2) clearInterval(timer);
         console.log("第一个：" + time);
         a = time;
        

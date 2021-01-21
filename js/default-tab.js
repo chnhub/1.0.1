@@ -4,34 +4,35 @@ var default_tab = {
             "id": "group1",
             "text": "元素事件",
             "children": [
-                {"value": 1, "text": "click", "func":"click", "description": ""},
-                {"value": 2, "text": "double_click", "func":"dbclick", "description": ""},
-                {"value": 3, "text": "input", "func":"val", "description": ""},
-                {"value": 4, "text": "select", "func":"select", "description": ""},
-                {"value": 5, "text": "set_frame", "func":"setframe", "description": ""},
-                {"value": 6, "text": "focus", "func":"focus", "description": ""},
-                {"value": 7, "text": "blur", "func":"blur", "description": ""},
-                {"value": 8, "text": "checkbox", "func":"checkbox", "description": ""},
-                {"value": 21, "text": "attr", "func":"attr", "description": ""},
-                {"value": 22, "text": "prop", "func":"prop", "description": ""},
+                {"value": 1, "text": "click", "func":"click", "description": "元素单击事件<br>(jquery:click)参数: <br>1. 无参数，调用jquery.trigger(\"click\")"},
+                {"value": 2, "text": "double_click", "func":"dbclick", "description": "元素双击事件<br>(jquery:dbclick)参数: <br>1. 无参数，调用jquery.trigger(\"dbclick\")"},
+                {"value": 3, "text": "input", "func":"val", "description": "元素赋值内容<br>(jquery:val)参数：<br>1. text: 元素需要替换文本内容"},
+                {"value": 4, "text": "select", "func":"select", "description": "下拉框选择<br>(ele:select)参数：<br>1. text: 需要选择的文本内容或者select的value"},
+                {"value": 5, "text": "set_frame", "func":"setframe", "description": "设置框架<br>(ele:setframe)参数: <br>1. 无参数"},
+                {"value": 6, "text": "focus", "func":"focus", "description": "元素获取焦点<br>(jquery:focus)参数: <br>1. 与jqery.focus()方法参数一致"},
+                {"value": 7, "text": "blur", "func":"blur", "description": "元素失去焦点<br>(jquery:blur)参数: <br>1. 与jqery.blur()方法参数一致"},
+                {"value": 8, "text": "checkbox", "func":"checkbox", "description": "是否勾选checkbox<br>(ele:checkbox)参数: <br>1. bool: 默认为true，true为勾选，flase为不勾选"},
+                {"value": 21, "text": "attr", "func":"attr", "description": "获取或设置元素属性<br>(jquery:attr)参数: <br>1. 与jqery.attr()方法参数一致"},
+                {"value": 22, "text": "prop", "func":"prop", "description": "获取或设置元素属性<br>(jquery:prop)参数: <br>1. 与jqery.prop()方法参数一致"},
+                {"value": 23, "text": "html", "func":"html", "description": "获取或设置元素内容<br>(jquery:html)参数: <br>1. 与jqery.html()方法参数一致"},
             ]
         },
         {
             "id": "group2",
             "text": "自定义事件",
             "children": [
-                {"value": 1001, "text": "upload_img", "func":"uploadImg", "description": ""},
-                {"value": 1002, "text": "wait_time", "func":"sleep", "description": ""},
+                {"value": 1001, "text": "upload_img", "func":"uploadImg", "description": "上传图片<br>(ele:uploadImg)参数：<br>selector: 图片元素的选择器，为#时则仅上传图片<br>1. imgpath: 图片的url（可直接写stu与coa两张自带的图片，空则默认stu）<br>2. uploadpath:上传图片的url（不支持跨域）<br>3. prepath: 设置元素的图片url的前缀，空默认'../../../photos'<br>4. field: 返回数据中图片地址的字段，空默认为'path'，支持简单多级json'data.img.path'"},
+                {"value": 1002, "text": "wait_time", "func":"sleep", "description": "强制等待或显示等待下个事件<br>(ele:sleep)参数：<br>1. number: 等待*秒后执行下个事件<br>------------<br>[number,number]必须有','<br>1. number: 在*秒中执行下个事件，执行成功立即停止等待（根据下个事件的元素是否定位到）<br>2. number-N: 每*毫秒执行一次"},
             ]
         },
         {
             "id": "group3",
             "text": "现成数据",
             "children": [
-                {"value": 2001, "text": "get_name", "func":"getStuName", "description": ""},
-                {"value": 2002, "text": "get_idnum", "func":"getIDNum", "description": ""},
-                {"value": 2003, "text": "get_phone_number", "func":"getTelPhone", "description": ""},
-                {"value": 2100, "text": "get_random_number", "func":"getRDNum", "description": ""},
+                {"value": 2001, "text": "get_name", "func":"getStuName", "description": "获取随机名字<br>(ele:getStuName)参数：<br>1. prename: 名字前缀，空默认为'测试'<br>- 返回:[前缀+市+4位伪随机数]，[市]获取页面标题截取省-市之间或市之前内容，未截取到则默认为空，伪随机数每秒一个"},
+                {"value": 2002, "text": "get_idnum", "func":"getIDNum", "description": "获取随机身份证号<br>(ele:getIDNum)参数：<br>1. 无参数"},
+                {"value": 2003, "text": "get_phone_number", "func":"getTelPhone", "description": "获取随机手机号<br>(ele:getTelPhone)参数：<br>1. prenumber: 手机号前缀，空默认为'136'<br>- 返回: [前缀+伪随机数]<br>伪随机数根据秒数生成，每秒一个"},
+                {"value": 2100, "text": "get_random_number", "func":"getRDNum", "description": "获取随机数字<br>(ele:getRDNum)参数：<br>1. length: 随机数的长度<br>2. pre-N: 随机数前缀，默认空<br>3. suffix-N: 随机数后缀，默认空<br>- 返回: [前缀+随机数+后缀]"},
             ]
         }
     ],

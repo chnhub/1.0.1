@@ -133,3 +133,14 @@ function getListByFiled(list, field, filed_value){
     }
     return list_new;
 }
+//返回list中每项的field_name字段值的合并
+function selectChromeStorage2(list, field_name) {
+    var data = [];
+    for (var i = 0; i < list.length; i++) {
+        const element = list[i];
+        if(element[field_name]){
+            data = data.concat(element[field_name]);
+        }
+    }
+    return data;
+}

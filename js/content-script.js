@@ -1,6 +1,6 @@
 (function () {
 
-	var PROJECTIPTABLE = "allowInjectionIP";// 主表名
+	var PROJECTIPTABLE = "allowInjectionIP";// 主表名 暂未使用
 	var CLICK_EVENT_TAB = [];// 事件表
 	var float_div_width = 100;
 	var float_div_height = 100;
@@ -11,12 +11,11 @@
 		initContentPage(); //异步 因为chrome读取本地数据是异步的
 
 	});
+
 	async function initContentPage() {
 		CLICK_EVENT_TAB =await selectChromeStorage2("click_event_tab", "children");
 		//CLICK_EVENT_TAB =await selectChromeStorage("click_event_tab");
-
 		addFloatDiv_bk();
-
 	}
 
 	// 监听长连接
@@ -139,6 +138,7 @@
 			}
 			await wait(); //等待btnmenu数据查询完成
 			setBtnCss(".btnmenu"); //设置按钮样式
+			//浮动div上的按钮点击事件  
 			$(".btnmenu").click(function (f) {
 
 				var btnmenu_id = f.currentTarget.id.split("conbtn_")[1];
@@ -174,7 +174,7 @@
 								page_frame = $(el.selector)[0].contentWindow.document;
 								continue;
 							case 1002:// sleep函数特殊处理
-								wait_time = parseInt(el["params"]);
+								wait_time = el["params"];
 								el.selectormode = 0;
 								//$ele = null;
 								continue;
