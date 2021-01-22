@@ -165,12 +165,17 @@
 						//单独处理setframe，先处理不同的事件
 						switch(parseInt(el["eventid"])){
 							case 5://setframe 要特殊处理
-								if(!$(el.selector).length > 0){
+								var $iframe = $(el.selector); //未定位到iframe
+								if($iframe.length <= 0){
 									console&&console.log("%c%s",
 									"color: red; background: yellow;",`ERROR: [id:${el.id}][name:${el.name}]未定位到元素!(${el.selector})↓`, el);
 									alert(`未定位到frame：${el.selector}`);
 									return;
-								}
+								}else if($iframe.length > 1){ // 多个iframe
+									ELE_EVENTS.log("error", `ERROR: [id:${el.id}][name:${el.name}] 定位到多个框架!(${el.selector})↓`,el);
+									alert(`存在多个相同的iframe: \nid: ${el.id}\nname: ${el.name}\nselector: ${el.selector}`);
+									return;
+								} 
 								page_frame = $(el.selector)[0].contentWindow.document;
 								continue;
 							case 1002:// sleep函数特殊处理
@@ -192,6 +197,7 @@
 								}else{
 									$ele = $(document.evaluate(el.selector, document).iterateNext());			
 								}
+
 								break;				
 							case 1: //jquery
 								//特殊处理：切换框架，仅支持两层框架嵌套
