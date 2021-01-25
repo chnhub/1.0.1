@@ -28,7 +28,23 @@
         btnmenu_tab = await queryChromeStorage2("btnmenu");
         initOptions();
         initPageEvent();
+        initSwitch();
     })();
+    //初始化switch
+    function initSwitch() {
+        
+
+        //size 设置禁用可用按钮的大小、secondaryColor：设置右边的颜色为红色
+        // var switchery = new Switchery(elem, {size:"large",secondaryColor:"red"});
+       
+        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+        var el = $('.js-switch'), changeField = document.querySelector('.js-check-change-field');
+
+        elems.forEach(function(html) {
+        var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
+        });
+
+    }
 
     function initOptions() {
         initCollapse("#accordion", btnmenu_tab);
@@ -252,24 +268,28 @@
                 field: "status",
                 title: "Status",
                 align: "center",
-                // formatter: function (value, row, index) {
-                //     if (!value) return 1;
-                // },
-                editable: {
-                    //emptytext: "不能为空",
-                    //mode: "inline",
-                    // placement: 'top',
-                    type: 'text',
-                    title: '是否开启',
-                    id: "status",
-                    placeholder: "事件是否执行|0-否 1-是",
-                    pk: "status",
-                    validate: function (v) {
-                        if (!v) return '不能为空';
-                        if (parseInt(v) != 0&&parseInt(v) != 1) return '输入1或0';
-                    }
-                    //success: function(response, newValue) {  return true;}
-                }
+                formatter: function (value, row, index) {
+                    //if (!value) 
+                    //var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+                    var s = "";
+                    if (!value) s = "checked";
+                    return `<input type="checkbox" class="checkbox-switch" ${s}>`;
+                },
+                // editable: {
+                //     //emptytext: "不能为空",
+                //     //mode: "inline",
+                //     // placement: 'top',
+                //     type: 'text',
+                //     title: '是否开启',
+                //     id: "status",
+                //     placeholder: "事件是否执行|0-否 1-是",
+                //     pk: "status",
+                //     validate: function (v) {
+                //         if (!v) return '不能为空';
+                //         if (parseInt(v) != 0&&parseInt(v) != 1) return '输入1或0';
+                //     }
+                //     //success: function(response, newValue) {  return true;}
+                // }
 
             }, {
                 width: 150,
@@ -328,9 +348,12 @@
             //style={css:{'background-color':'#ed5565'}};
             style={classes: 'bg-warning'};
         }
-        if (!parseInt(row["status"])) {
+        //禁用颜色加深
+        if (parseInt(row["status"]) === 0) {
             //style={css:{'background-color':'#ed5565'}};
-            style={classes: 'bg-secondary'};
+            //style={classes: 'bg-secondary'}; #C0C0C0
+            style={css: {'background-color':'#C0C0C0'} }; 	
+            //style={css: {'color':'red'} };
         }
         //style={css:{'background-color':'#ed5565'}};
         //style={ classes:'bg-warning'};
@@ -339,7 +362,7 @@
     //初始化页面上的事件
     function initPageEvent(params) {
         var select_cell_index = 0;// 选中的行号
-        
+
         //选中一行
         $(`.table`).on('click-row.bs.table', function (event, row, $ele, dfield) {
             $ele = $("#right_tips_div");
