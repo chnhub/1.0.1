@@ -249,6 +249,30 @@
                 }
             }, {
                 width: 150,
+                field: "status",
+                title: "Status",
+                align: "center",
+                // formatter: function (value, row, index) {
+                //     if (!value) return 1;
+                // },
+                editable: {
+                    //emptytext: "不能为空",
+                    //mode: "inline",
+                    // placement: 'top',
+                    type: 'text',
+                    title: '是否开启',
+                    id: "status",
+                    placeholder: "事件是否执行|0-否 1-是",
+                    pk: "status",
+                    validate: function (v) {
+                        if (!v) return '不能为空';
+                        if (parseInt(v) != 0&&parseInt(v) != 1) return '输入1或0';
+                    }
+                    //success: function(response, newValue) {  return true;}
+                }
+
+            }, {
+                width: 150,
                 field: "order",
                 title: "Order",
                 align: "center",
@@ -304,6 +328,10 @@
             //style={css:{'background-color':'#ed5565'}};
             style={classes: 'bg-warning'};
         }
+        if (!parseInt(row["status"])) {
+            //style={css:{'background-color':'#ed5565'}};
+            style={classes: 'bg-secondary'};
+        }
         //style={css:{'background-color':'#ed5565'}};
         //style={ classes:'bg-warning'};
         return style;
@@ -351,6 +379,7 @@
                     "selectormode": "1",
                     "selector": "#",
                     "eventid": "1",
+                    "status": "1"
                     //"params": null,
                     //"code": "",
                     //"order": 1

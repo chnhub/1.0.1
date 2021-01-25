@@ -303,17 +303,17 @@
 
 		});
 		$(floatdivid).mouseenter(function () {
-			$("#floatdiv_sub").css({"display":""});
+			//$("#floatdiv_sub").css({"display":""});
 			
 			//$("#floatdiv_sub").removeAttr("hidden");
 			//console.log("fadeIn");
-			//$("#floatdiv_sub").stop(true,true).fadeIn();
+			$("#floatdiv_sub").stop(true,true).fadeIn();
 		});
 		$(floatdivid).mouseleave(function () {
-			$("#floatdiv_sub").css({"display":"none"});
+			//$("#floatdiv_sub").css({"display":"none"});
 			//$(floatdivid).css("background-image", "url(" + bak_img2 + ")");
 			//$("#floatdiv_sub").attr("hidden", "hidden");
-			//$("#floatdiv_sub").stop(true,true).fadeOut();
+			$("#floatdiv_sub").stop(true,true).fadeOut();
 		});
 
 		$("#testbtn1").click(function () {
