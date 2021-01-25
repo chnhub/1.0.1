@@ -1,9 +1,11 @@
 (function () {
-
-	var PROJECTIPTABLE = "allowInjectionIP";// 主表名 暂未使用
+	
+	var PROJECTIPTABLE = "allowInjectionIP";// 主表名
 	var CLICK_EVENT_TAB = [];// 事件表
 	var float_div_width = 100;
 	var float_div_height = 100;
+	var CHROME_LAST_ERROR = null; //chrome的报错信息
+
 
 	//页面加载完毕后执行
 	document.addEventListener('DOMContentLoaded', function () {
@@ -11,11 +13,12 @@
 		initContentPage(); //异步 因为chrome读取本地数据是异步的
 
 	});
-
 	async function initContentPage() {
 		CLICK_EVENT_TAB =await selectChromeStorage2("click_event_tab", "children");
 		//CLICK_EVENT_TAB =await selectChromeStorage("click_event_tab");
+
 		addFloatDiv_bk();
+
 	}
 
 	// 监听长连接
@@ -118,7 +121,7 @@
 			// </div>
 		$(floatdivid).remove();
 		$("body").append(div_template);//添加div
-		$(floatdivid).css({ "background-image": "url(" + bak_img2 + ")", "background-color": "rgb(245, 245, 245)", "border-radius": "8px" });
+		$(floatdivid).css({ "background-image": "url(" + bak_img2 + ")", "background-color": "rgb(245, 245, 245)", "border-radius": "8px","opacity": "0.8"});
 		var tabname = "btnmenu";
 		//等待查询完毕后添加按钮
 		async function addbtnmenu(tabname) {
@@ -138,10 +141,19 @@
 			}
 			await wait(); //等待btnmenu数据查询完成
 			setBtnCss(".btnmenu"); //设置按钮样式
-			//浮动div上的按钮点击事件  
-			$(".btnmenu").click(function (f) {
+			$(".btnmenu").click(function (target) {
+				$(target.currentTarget).attr("disabled", true);//禁用按钮
+				//检查插件是否可用
+				try {
+					chrome.storage.sync.get("", function () {});
+				} catch (error) {
+					if (error.message.indexOf(`Extension context invalidated`) != -1){
+						alert("请重新刷新该页面激活插件！");
+					}
+					return;
+				}
 
-				var btnmenu_id = f.currentTarget.id.split("conbtn_")[1];
+				var btnmenu_id = target.currentTarget.id.split("conbtn_")[1];
 				console.log("btnmenu_id:",btnmenu_id);
 				selectChromeStorageByField("event_list", "btnid", `collapse_${btnmenu_id}`, function (data) {
 					var page_frame = null;//需要特殊处理的连个事件
@@ -160,42 +172,38 @@
 							page_frame = $(el.selector)[0].contentWindow.document;
 							continue;
 						};*/
-						console.log("事件：",i+1, el.name);
-						if (!el.selector||el.selector === "#") el.selectormode = 0;
+						console.log("事件：",i+1);
 						//单独处理setframe，先处理不同的事件
 						switch(parseInt(el["eventid"])){
 							case 5://setframe 要特殊处理
-								var $iframe = $(el.selector); //未定位到iframe
-								if($iframe.length <= 0){
+								if(!$(el.selector).length > 0){
 									console&&console.log("%c%s",
 									"color: red; background: yellow;",`ERROR: [id:${el.id}][name:${el.name}]未定位到元素!(${el.selector})↓`, el);
 									alert(`未定位到frame：${el.selector}`);
 									return;
-								}else if($iframe.length > 1){ // 多个iframe
-									ELE_EVENTS.log("error", `ERROR: [id:${el.id}][name:${el.name}] 定位到多个框架!(${el.selector})↓`,el);
-									alert(`存在多个相同的iframe: \nid: ${el.id}\nname: ${el.name}\nselector: ${el.selector}`);
-									return;
-								} 
+								}
 								page_frame = $(el.selector)[0].contentWindow.document;
 								continue;
 							case 1002:// sleep函数特殊处理
-								wait_time = el["params"];
+								wait_time = parseInt(el["params"]);
 								el.selectormode = 0;
 								//$ele = null;
 								continue;
-							// case 1001:// uploadimg函数特殊处理
-							// 	el.selectormode = 0;
-							// 	//$ele = null;
-							// 	break;
 						}
 						
 						//不同定位方式分别处理
 						switch (parseInt(el.selectormode)) {
 							case 2: //xpath
-								if (page_frame) {
-									$ele = $(document.evaluate(el.selector, page_frame).iterateNext());			
-								}else{
-									$ele = $(document.evaluate(el.selector, document).iterateNext());			
+								try {
+									if (page_frame) {
+										$ele = $(document.evaluate(el.selector, page_frame).iterateNext());			
+									}else{
+										$ele = $(document.evaluate(el.selector, document).iterateNext());			
+									}
+								} catch (error) {
+									ELE_EVENTS.log("error",`ERROR: [id:${el.id}][name:${el.name}]未定位到元素!(${el.selector})↓`, el);
+									console.log(error);
+									continue;
 								}
 
 								break;				
@@ -228,21 +236,20 @@
 										}else{
 											ELE_EVENTS.base_events($ele, e.func, el.params, el);
 										}
-										
+										wait_time = null;
 										break;
-								}
-											
+								}					
 								return true;
 								//$ele.trigger("blur");
 							}
+							
 						});
-						wait_time = null;	//一次循环结束清空定时
 					}
 				});
 
 				//alert("dianjile ");
 				
-			
+				$(target.currentTarget).attr("disabled", false);//解禁按钮
 			}); //添加菜单按钮事件
 		}
 		addbtnmenu(tabname);// 必须用等待 异步查询数据完成
