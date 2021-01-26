@@ -41,11 +41,20 @@
         var el = $('.js-switch'), changeField = document.querySelector('.js-check-change-field');
 
         elems.forEach(function(html) {
-        var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
+            var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
+            //switchery.events = testbox;
+            html.onchange = testbox;
         });
+        var elem = document.querySelectorAll('.js-switch');
+        //var init = new Switchery(elem);
+        elem.forEach(function(html) {
+            var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
 
+        });
     }
-
+    function testbox(params,a,b,c) {
+        var a = 1;
+    }
     function initOptions() {
         initCollapse("#accordion", btnmenu_tab);
     }
@@ -275,7 +284,7 @@
                     var s = "";
                     
                     if (parseInt(value) == 1) s = "checked";
-                    return `<input type="checkbox" class="my-switch" ${s}>`;
+                    return `<input type="checkbox" class="my-switch js-switch" ${s}>`;
                 },
                 // editable: {
                 //     //emptytext: "不能为空",
@@ -371,6 +380,9 @@
             var tbid = $(e.target).parentsUntil("div","table")[0].id;
             var iss = $(e.target).is(':checked');
             $(`#${tbid}`).bootstrapTable('updateCell', {index: index, field: "status" ,value: iss==0?0:1});
+            var el = $(`#${tbid} input.my-switch`);
+            var a = new Switchery(el[index], {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
+            //initSwitch();
         }
     };
 
