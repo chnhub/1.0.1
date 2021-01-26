@@ -268,12 +268,14 @@
                 field: "status",
                 title: "Status",
                 align: "center",
+                events: "changeBox",
                 formatter: function (value, row, index) {
                     //if (!value) 
                     //var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
                     var s = "";
-                    if (!value) s = "checked";
-                    return `<input type="checkbox" class="checkbox-switch" ${s}>`;
+                    
+                    if (parseInt(value) == 1) s = "checked";
+                    return `<input type="checkbox" class="my-switch" ${s}>`;
                 },
                 // editable: {
                 //     //emptytext: "不能为空",
@@ -303,6 +305,7 @@
                 title: "id",
                 align: "center",
             }],
+
             onEditableSave: function (field, row, index, $el, a, b) {
                 //alert(index);
                 cell_select_position[`table_${obj.id}`] = $(`#table_${obj.id}`).bootstrapTable('getScrollPosition');
@@ -318,6 +321,8 @@
         //$(`#table_${obj.id}`).bootstrapTable("resetWidth");
 
     }
+
+
     //没辙 兼容性太难调
     function setTableHeight(tabid = null){
         //var tab_height = $(`#${tabid}`).parents(".bootstrap-table").height();
@@ -359,6 +364,16 @@
         //style={ classes:'bg-warning'};
         return style;
     }
+
+    window.changeBox = {
+        'change .my-switch': function (e, value, row, index) {
+            //两种方法定位到当前点的tab,1. 父元素查找 2. 内容约定id处理
+            var tbid = $(e.target).parentsUntil("div","table")[0].id;
+            var iss = $(e.target).is(':checked');
+            $(`#${tbid}`).bootstrapTable('updateCell', {index: index, field: "status" ,value: iss==0?0:1});
+        }
+    };
+
     //初始化页面上的事件
     function initPageEvent(params) {
         var select_cell_index = 0;// 选中的行号

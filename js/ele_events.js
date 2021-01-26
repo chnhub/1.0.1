@@ -409,7 +409,10 @@ var ELE_EVENTS = ELE_EVENTS||{
                 clr = "red";
                 bg = "yellow";
                 break;
-
+            case "warning":
+                clr = "blue";
+                bg = "white";
+                break;
             default:
                 break;
         }

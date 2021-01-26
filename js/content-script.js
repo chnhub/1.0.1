@@ -173,6 +173,14 @@
 							continue;
 						};*/
 						console.log("事件：",i+1);
+						//禁用执行
+						if(parseInt(el.status) == 0){
+							ELE_EVENTS.log("warning",`warning: [id:${el.id}][name:${el.name}]事件已禁用!(${el.selector})↓`, el);
+							continue;
+						}
+						
+							
+						
 						//单独处理setframe，先处理不同的事件
 						switch(parseInt(el["eventid"])){
 							case 5://setframe 要特殊处理
@@ -190,7 +198,7 @@
 								//$ele = null;
 								continue;
 						}
-						
+						try {
 						//不同定位方式分别处理
 						switch (parseInt(el.selectormode)) {
 							case 2: //xpath
@@ -231,11 +239,13 @@
 										break;
 								
 									default:
+									
 										if(wait_time){											
 											ELE_EVENTS.base_events_wait(el.selector, page_frame, e.func, el.params, el, wait_time);
 										}else{
 											ELE_EVENTS.base_events($ele, e.func, el.params, el);
 										}
+
 										wait_time = null;
 										break;
 								}					
@@ -244,6 +254,9 @@
 							}
 							
 						});
+					} catch (error) {
+						ELE_EVENTS.log("error",error);
+					}
 					}
 				});
 
