@@ -41,16 +41,24 @@
         var el = $('.js-switch'), changeField = document.querySelector('.js-check-change-field');
 
         elems.forEach(function(html) {
-            var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
+            //var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
             //switchery.events = testbox;
             html.onchange = testbox;
         });
-        var elem = document.querySelectorAll('.js-switch');
-        //var init = new Switchery(elem);
-        elem.forEach(function(html) {
-            var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
 
-        });
+        $('.my-switch').bootstrapSwitch({  
+            onText:"启动",  
+            offText:"停止",  
+            onColor:"success",  
+            offColor:"warning", 
+            //offColor:"#eee", 
+            size:"small",  
+            onSwitchChange:function(e, state){  
+                var e1  = $(e.target);
+                //$(e.target).attr('checked', state);
+                $(e1).change();
+            }  
+         }) 
     }
     function testbox(params,a,b,c) {
         var a = 1;
@@ -158,6 +166,7 @@
             //editable: true,
             //clickToSelect: true,
             //height: tab_want_height,
+            uniqueId: "id",
             undefinedText:"",
             toolbar: `#toolbar_${obj.id}`,
             rowStyle: setRowStyle,
@@ -284,7 +293,8 @@
                     var s = "";
                     
                     if (parseInt(value) == 1) s = "checked";
-                    return `<input type="checkbox" class="my-switch js-switch" ${s}>`;
+                    
+                    return `<input type="checkbox" class="my-switch js-switch " ${s}>`;
                 },
                 // editable: {
                 //     //emptytext: "不能为空",
@@ -377,12 +387,17 @@
     window.changeBox = {
         'change .my-switch': function (e, value, row, index) {
             //两种方法定位到当前点的tab,1. 父元素查找 2. 内容约定id处理
-            var tbid = $(e.target).parentsUntil("div","table")[0].id;
+            //var tbid = $(e.target).parentsUntil("div","table")[0].id; //1
+            var tbid = "table_" + row.btnid.split("_")[1]; //2
             var iss = $(e.target).is(':checked');
-            $(`#${tbid}`).bootstrapTable('updateCell', {index: index, field: "status" ,value: iss==0?0:1});
+            $(`#${tbid}`).bootstrapTable('updateCellByUniqueId', {id: row.id, field: "status", value: iss==0?0:1, reinit: false});
             var el = $(`#${tbid} input.my-switch`);
-            var a = new Switchery(el[index], {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
-            //initSwitch();
+            //var a = new Switchery(el[index], {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
+            //var e1 = $(e.target).parent().parent(); //1
+            var e1 = $(e.target).parentsUntil("table","tr") //2
+            $("td", e1).css("background-color","");//清除每个cell的背景色
+            e1.css("background-color",iss==0?"#C0C0C0":"");// 重新设置颜色
+            
         }
     };
 
