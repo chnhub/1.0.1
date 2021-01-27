@@ -37,22 +37,23 @@
         //size 设置禁用可用按钮的大小、secondaryColor：设置右边的颜色为红色
         // var switchery = new Switchery(elem, {size:"large",secondaryColor:"red"});
        
-        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+        //var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
         var el = $('.js-switch'), changeField = document.querySelector('.js-check-change-field');
-
+        var elems = document.querySelectorAll('.js-switch')
         elems.forEach(function(html) {
+            //重新绘制表时 会变为系统的switch -- 未解决
             //var switchery = new Switchery(html, {size:"small", color:'#26a8eb', secondaryColor:"#e4e4e4"});
             //switchery.events = testbox;
             html.onchange = testbox;
         });
 
         $('.my-switch').bootstrapSwitch({  
-            onText:"启动",  
-            offText:"停止",  
-            onColor:"success",  
-            offColor:"warning", 
-            //offColor:"#eee", 
-            size:"small",  
+            onText:"ON",  
+            offText:"OFF",  
+            onColor:"info",  
+            //offColor:"warning", 
+            offColor:"", 
+            size:"mini",  
             onSwitchChange:function(e, state){  
                 var e1  = $(e.target);
                 //$(e.target).attr('checked', state);
@@ -169,6 +170,14 @@
             uniqueId: "id",
             undefinedText:"",
             toolbar: `#toolbar_${obj.id}`,
+            showExport: false,//工具栏上显示导出按钮
+            //Icons:'glyphicon-export',
+            export: 'glyphicon-export icon-share',
+            exportDataType: "basic",//显示导出范围
+            exportTypes: ['json', 'xml', 'png', 'csv', 'txt', 'sql', 'doc', 'excel', 'xlsx', 'pdf'],//导出格式
+            exportOptions: {//导出设置
+                fileName: 'Tablexxx',//下载文件名称
+            },
             rowStyle: setRowStyle,
             columns: [{
                 width: 38,
@@ -282,7 +291,7 @@
                     //success: function(response, newValue) {  return true;}
                 }
             }, {
-                width: 150,
+                width: 95,
                 field: "status",
                 title: "Status",
                 align: "center",
@@ -383,7 +392,7 @@
         //style={ classes:'bg-warning'};
         return style;
     }
-
+    //switch 事件
     window.changeBox = {
         'change .my-switch': function (e, value, row, index) {
             //两种方法定位到当前点的tab,1. 父元素查找 2. 内容约定id处理
@@ -404,8 +413,12 @@
     //初始化页面上的事件
     function initPageEvent(params) {
         var select_cell_index = 0;// 选中的行号
-
-        //选中一行
+        
+        //点击一行
+        $(`.table`).on('reset-view.bs.table', function (event, row, $ele, dfield) {
+            initSwitch();
+        });
+        //点击一行
         $(`.table`).on('click-row.bs.table', function (event, row, $ele, dfield) {
             $ele = $("#right_tips_div");
             $ele.children("p").html(dfield);
