@@ -24,14 +24,13 @@ var ELE_EVENTS = ELE_EVENTS||{
      * @param {string} dec 描述
      */
     base_events: function ($ele, events_name, params, row = []) {
-        console.log("base_events被调用了");
+        console.log(`${row.id}事件被调用了`);
         //this.test(1, 2);
         if(!events_name)return null;
         var script = null;
         var eve = events_name; // 方法名字
         var eve_ = "";  //方法参数不带括号()
         var eve__ = "";  //方法参数带括号()
-        $ele&&($ele = $($ele)); //以防万一再包一层jquery
         //多个参数时进行切割
         if(params&&(typeof(params)==="string")&&params.split(",")!=-1){
             params = params.split(",");
@@ -48,7 +47,8 @@ var ELE_EVENTS = ELE_EVENTS||{
         //eve_ = `(${eve_})`;
         //console.log(eve_);
         if ($ele) {
-            if($ele.length<1&&params != "sleep"){
+            $ele&&($ele = $($ele)); //以防万一再包一层jquery
+            if($ele.length<1&&events_name != "uploadImg"){
                 console&&console.log("%c%s",
                 "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${row.selector})↓`,row);
                 return;
@@ -59,57 +59,61 @@ var ELE_EVENTS = ELE_EVENTS||{
                 script = `_eve${eve__}`;
             }else{
                  //调用对象的方法 object.fun(p);
-                script = `_eve.${eve}${eve__}`;
                 script = '';
-                for(var i = 0; i < _eve.length; i++){
                 switch (eve) {
-                    case "val":
-                        script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve__}.trigger("blur");`;
-                        break;
-
-                    case "select":
-                        _eve.eq(i).find("option:selected").attr("selected", false);
-                        _eve.eq(i).find(`option:contains('${params}')`).attr("selected", true);
-                        //script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve_}.trigger("blur");`;
-                        if(_eve.eq(i).find("option:selected").text() != params && _eve.eq(i).val() != params){
-                            _eve.eq(i).find(`option[value='${params}']`).attr("selected","selected");
-                        }
-                        //优化 判断select的text和value都与参数不同时，则表示未找到改select
-                        if(_eve.eq(i).find("option:selected").text() != params && _eve.eq(i).val() != params){this.log("error",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${row.selector})↓`,row)}
-                        break;
-
-                    case "click": case "blur": case "focus": case "blur": case "change": case "dblclick": case "keydown": case "keyup": case "keyup": case "mousedown": case "mouseup":
-                        script = script + `_eve.eq(${i}).trigger("${eve}");`;
-                        break;
-
-                    case "getStuName": case "getIDNum": case "getTelPhone": //默认全是输入
-                        var temp = `this.${eve}${eve__}`;
-                        if(i == 0){script = `_eve.val(this.${eve}${eve__});`}// 仅在第一次拼接赋值语句
-                        //script = script + `_eve.eq(${i}).trigger("focus").val(this.${eve}${eve_}).trigger("blur");`;
-                        script = script + `_eve.eq(${i}).trigger("focus").trigger("blur");`;
-                        break;
-                    case "checkbox":
-                        if(!params)eve_=true;
-                        script = script + `_eve.eq(${i}).prop("checked",JSON.parse(${eve_}))`;
-                        break;
-                    case "sleep":
-                        script = script + `this.${eve}${eve__}`;
-                        break;
                     case "uploadImg":
-                        var  img = new Object();                   
+                        var  img = new Object();          
                         img.imgpath = params[0]; 
                         img.uploadpath = params[1];
                         img.urlprefix = params[2];
-                        img.field = params[3];
+                        img.field = params[3];  
+                        img.ele_other = params[4];  
+                        img.ele_other_model = params[5];            
                         img.ele = _eve.eq(i);
                         //script = script + `this.${eve}(${eve_},_eve.eq(${i}))`;
+                        _eve.length == 0?img.ele=null:1;
                         script = script + `this.${eve}(img)`;
                         break;
-
-                    default:
-                        script = script + `_eve.eq(${i}).${eve}${eve__}`;
-                        break;
                 }
+                for(var i = 0; i < _eve.length; i++){
+                    switch (eve) {
+                        case "val":
+                            script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve__}.trigger("blur");`;
+                            break;
+
+                        case "select":
+                            _eve.eq(i).find("option:selected").attr("selected", false);
+                            _eve.eq(i).find(`option:contains('${params}')`).attr("selected", true);
+                            //script = script + `_eve.eq(${i}).trigger("focus").${eve}${eve_}.trigger("blur");`;
+                            if(_eve.eq(i).find("option:selected").text() != params && _eve.eq(i).val() != params){
+                                _eve.eq(i).find(`option[value='${params}']`).attr("selected","selected");
+                            }
+                            //优化 判断select的text和value都与参数不同时，则表示未找到改select
+                            if(_eve.eq(i).find("option:selected").text() != params && _eve.eq(i).val() != params){this.log("error",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${row.selector})↓`,row)}
+                            break;
+
+                        case "click": case "blur": case "focus": case "blur": case "change": case "dblclick": case "keydown": case "keyup": case "keyup": case "mousedown": case "mouseup":
+                            script = script + `_eve.eq(${i}).trigger("${eve}");`;
+                            break;
+
+                        case "getStuName": case "getIDNum": case "getTelPhone": //默认全是输入
+                            var temp = `this.${eve}${eve__}`;
+                            if(i == 0){script = `_eve.val(this.${eve}${eve__});`}// 仅在第一次拼接赋值语句
+                            //script = script + `_eve.eq(${i}).trigger("focus").val(this.${eve}${eve_}).trigger("blur");`;
+                            script = script + `_eve.eq(${i}).trigger("focus").trigger("blur");`;
+                            break;
+                        case "checkbox":
+                            if(!params)eve_=true;
+                            script = script + `_eve.eq(${i}).prop("checked",JSON.parse(${eve_}))`;
+                            break;
+                        case "sleep":
+                            script = script + `this.${eve}${eve__}`;
+                            break;
+                        default:
+                            script = script + `_eve.eq(${i}).${eve}${eve__}`;
+                            break;
+                    }
+
                 }
             }
         }else {
@@ -131,7 +135,7 @@ var ELE_EVENTS = ELE_EVENTS||{
     test1: function(a, b){
         console.log(a, b)
     },
-    base_events_wait:function($ele, iframe, events_name, params, row = [], wait_time = 3) {
+    base_events_wait:function($ele, iframe, events_name, params, row = [], wait_time = '3') {
         console.log(`延迟${wait_time}秒调用`);
         var obj = this;
         var $el = null;
@@ -140,25 +144,41 @@ var ELE_EVENTS = ELE_EVENTS||{
             this.recordTime(function(timer){
                 switch (parseInt(row.selectormode)) {
                     case 2:
-                        $el = $(document.evaluate($ele, iframe).iterateNext()); 
+                        if (iframe) {
+                            $el = $(document.evaluate($ele, iframe).iterateNext()); 
+                        }else{
+                            $el = $(document.evaluate($ele, document).iterateNext());
+                        }
                         break;            
                     default:
-                        $el = $ele; 
+                        if (iframe) {
+                            $el = $($ele, iframe);
+                        }else{
+                            $el = $ele; 
+                        } 
                         break;
                 }
                 if ($el.length < 0) return;
-                obj.base_events($el, events_name, params, row);
                 clearInterval(timer);
+                obj.base_events($el, events_name, params, row);
             }, parseInt(p[0]), parseInt(p[1])||300);
         }else {
             setTimeout(function() {
                 switch (parseInt(row.selectormode)) {
                     case 2:
-                        obj.base_events_xpath($ele, iframe, events_name, params, row);
+                        if (iframe) {
+                            obj.base_events_xpath($ele, iframe, events_name, params, row);
+                        }else{
+                            obj.base_events_xpath($ele, document, events_name, params, row);
+                        }
                         break;
                 
                     default:
-                        obj.base_events($ele, events_name, params, row);
+                        if (iframe) {
+                            obj.base_events($ele, events_name, params, row);
+                        }else {
+                            obj.base_events($($ele, iframe), events_name, params, row);
+                        }
                         break;
                 }
                 
@@ -277,7 +297,7 @@ var ELE_EVENTS = ELE_EVENTS||{
     uploadImg: function(img){
         var obj = this;
         var ele_img = arguments[arguments.length-1];
-        var imgph =  this.getImgBase64(img.imgpath, function(base64) {
+        var imgph = this.getImgBase64(img.imgpath, function(base64) {
             if (!base64) return;
             var imgobj = new Object();
             imgobj.ele = img.ele;
@@ -290,7 +310,9 @@ var ELE_EVENTS = ELE_EVENTS||{
             img.urlprefix&&(imgobj.urlprefix = img.urlprefix);
             img.field&&(imgobj.field = img.field);
             img.uploadpath&&(imgobj.uploadpath = img.uploadpath);
-            obj.uploadimg(imgobj, function(data){
+            imgobj.ele_other = img.ele_other;  
+            imgobj.ele_other_model = img.ele_other_model; 
+            var result =  obj.uploadimg(imgobj, function(data){
                     //$(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
                     var script = `data.${imgobj.field}`;
                     var retu = eval(script);
@@ -298,16 +320,42 @@ var ELE_EVENTS = ELE_EVENTS||{
                     ELE_EVENTS.log(null,JSON.stringify(data));
                     console.log("处理后imgurl：", retu);
                     imgobj.ele&&$(imgobj.ele).attr("src", retu);
+                    //上传图片成功后修改另外一个控件的值
+                    imgobj.ele_other_model||(imgobj.ele_other_model=1);
+                    if(!imgobj.ele_other) return;
+                    switch (parseInt(imgobj.ele_other_model)) {
+                        case 2:
+                            if (imgobj.ele_other_model) {
+                                if (page_frame) {
+                                    $ele = $(document.evaluate(el.selector, page_frame).iterateNext());			
+                                }else{
+                                    $ele = $(document.evaluate(el.selector, document).iterateNext());			
+                                }
+                            }else{
+                                ELE_EVENTS.base_events_xpath($ele, document, events_name, params, row);
+                            }
+                            break;
                     
+                        default:
+                            if (imgobj.ele_other_model) {
+                                ELE_EVENTS.base_events($ele, events_name, params, row);
+                            }else {
+                                ELE_EVENTS.base_events($($ele, iframe), events_name, params, row);
+                            }
+                            break;
+                    }
+                           
             });
         });
+        return obj.returnJson;
         return `图片路径：${imgph}  上传地址：${img.uploadpath}`;
     },
-    getImgBase64: function(imgUrl, callback) {
+    getImgBase64: async function(imgUrl, callback) {
        
         if(!imgUrl)imgUrl = "stu";
         var reg = "^([hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://)(([A-Za-z0-9-~]+).)+([A-Za-z0-9-~\\/])+$";
         var re = new RegExp(reg);
+        var result = null;
         //未填写路径拿本地图片
         if (!re.test(imgUrl)){   
             if (imgUrl.toLowerCase().indexOf("stu") != -1) imgUrl = "/img/stu.jpg";
@@ -317,7 +365,7 @@ var ELE_EVENTS = ELE_EVENTS||{
         }
         window.URL = window.URL || window.webkitURL;
         var xhr = new XMLHttpRequest();
-        xhr.open("get", imgUrl, true);
+        xhr.open("get", imgUrl, true);//
         // 至关重要
         xhr.responseType = "blob";
         xhr.onload = function () {
@@ -330,13 +378,13 @@ var ELE_EVENTS = ELE_EVENTS||{
                 oFileReader.onloadend = function (e) {
                     // 此处拿到的已经是 base64的图片了
                     var base64 = e.target.result;
-                    callback && callback(base64);
+                    callback && callback(base64)
                 };
                 oFileReader.readAsDataURL(blob);
             }
         }
-        xhr.send();
-        return imgUrl;
+        var a = xhr.send();
+        return result;
     },
     /**
 	 * 
@@ -349,6 +397,7 @@ var ELE_EVENTS = ELE_EVENTS||{
 		imgobj.name || (imgobj.name = 'file1');
 		imgobj.filename || (imgobj.filename = 'null.jpg');
 
+        var result = null;
 		var imgtype = imgobj.imgbase64.substring(imgobj.imgbase64.indexOf("image/") + 6, imgobj.imgbase64.indexOf(";"));
 		var data = atob(imgobj.imgbase64.split(',')[1]);
 		var ia = new Uint8Array(data.length);
@@ -376,13 +425,14 @@ var ELE_EVENTS = ELE_EVENTS||{
 			},
 			success: function (data) {
 				//console.log(data)
-				callback(data);
+                callback(data);
+                //result = data;
 			},
 			error: function (data) {
 				console.log(data)
 			}
 		});
-
+        return result;
 	},
     /** 图片有关 */
     /** 定时执行，time秒内每once毫秒内执行一次回调函数 */

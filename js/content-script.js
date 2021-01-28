@@ -179,8 +179,6 @@
 							continue;
 						}
 						
-							
-						
 						//单独处理setframe，先处理不同的事件
 						switch(parseInt(el["eventid"])){
 							case 5://setframe 要特殊处理
@@ -193,7 +191,7 @@
 								page_frame = $(el.selector)[0].contentWindow.document;
 								continue;
 							case 1002:// sleep函数特殊处理
-								wait_time = parseInt(el["params"]);
+								wait_time = el["params"];
 								el.selectormode = 0;
 								//$ele = null;
 								continue;
@@ -231,19 +229,14 @@
 								switch (parseInt(e["value"])) {
 									case 100200:
 										//ELE_EVENTS.base_events($ele, e.func, i, el);
-										(function(i){
-											setTimeout(function(){
-												console.log("++++=+",i);
-											}, 0);
-										})(i);
 										break;
 								
 									default:
 									
 										if(wait_time){											
-											ELE_EVENTS.base_events_wait(el.selector, page_frame, e.func, el.params, el, wait_time);
+											var a = ELE_EVENTS.base_events_wait(el.selector, page_frame, e.func, el.params, el, wait_time);
 										}else{
-											ELE_EVENTS.base_events($ele, e.func, el.params, el);
+											var b = ELE_EVENTS.base_events($ele, e.func, el.params, el);
 										}
 
 										wait_time = null;
@@ -453,7 +446,7 @@
 		stu.studenttype = '//div[contains(@class, "x-combo-list-item") and contains(text(), "初驾学员")]';
 		stu.qclassType = '//div[contains(@class, "x-combo-list-item") and contains(text(), "普通班")]';
 		stu.imgPhoto = 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3061473502,4241211073&fm=11&gp=0.jpg'
-		stu.imgPhoto2 = "http://122.225.207.133:20001/photos/upload/001/202011/00120201102095942.jpg";
+		stu.imgPhoto2 = "http://192.168.191.99:20001/photos/upload/001/202011/00120201102095942.jpg";
 		var stuDoc = $(sel.stuiframe);
 		if (stuDoc.length == 0) {
 			alert("未找到注册窗口");
@@ -518,9 +511,10 @@
 			imgobj.imgbase64 = base64;
 			imgobj.name = 'file1';
 			imgobj.filename = 'photo.jpg';
-			// uploadimg(imgobj,function(data){
-			// 	$(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
-			// });
+			uploadimg(imgobj,function(data){
+				 $(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
+				 $("#ePhoto", stuDoc).val(data.path);
+			});
 		});
 	}
 
