@@ -7,6 +7,9 @@ if (typeof jQuery == 'undefined') {
 }
 
 var ELE_EVENTS = ELE_EVENTS||{
+
+    aSetVar:{},//临时设置变量
+    aisdone:0,//是否上传完成照片
     /**身份证有关 */
     aProvince : [ 11 ,12 ,13 ,14 ,15 ,21 ,22 ,23 ,31 ,32 ,33 ,34 ,35 ,36 ,37 ,41 ,42 ,43 ,44 ,45 ,46 ,50 ,51 ,52 ,53 ,54 ,61 ,62 ,63 ,64 ,65  ],
 	aCity : ['0101', '0201'],
@@ -53,6 +56,11 @@ var ELE_EVENTS = ELE_EVENTS||{
                 "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]未定位到元素!(${row.selector})↓`,row);
                 return;
             }
+            if($ele.css("visibility") == "hidden"){
+                console&&console.log("%c%s",
+                "color: red; background: yellow;",`ERROR: [id:${row.id}][name:${row.name}]元素未显示!(${row.selector})↓`,row);
+                return;
+            }
             var _eve = $ele;
             if(typeof($ele) == "function"){
                 //调用传入的方法 fun(p);
@@ -60,6 +68,7 @@ var ELE_EVENTS = ELE_EVENTS||{
             }else{
                  //调用对象的方法 object.fun(p);
                 script = '';
+                //小于0的分开处理
                 switch (eve) {
                     case "uploadImg":
                         var  img = new Object();          
@@ -69,7 +78,8 @@ var ELE_EVENTS = ELE_EVENTS||{
                         img.field = params[3];  
                         img.ele_other = params[4];  
                         img.ele_other_model = params[5];            
-                        img.ele = _eve.eq(i);
+                        //img.ele = _eve.eq(0);
+                        img.ele = _eve;
                         //script = script + `this.${eve}(${eve_},_eve.eq(${i}))`;
                         _eve.length == 0?img.ele=null:1;
                         script = script + `this.${eve}(img)`;
@@ -104,13 +114,19 @@ var ELE_EVENTS = ELE_EVENTS||{
                             break;
                         case "checkbox":
                             if(!params)eve_=true;
-                            script = script + `_eve.eq(${i}).prop("checked",JSON.parse(${eve_}))`;
+                            script = script + `_eve.eq(${i}).prop("checked",JSON.parse(${eve_}));`;
                             break;
-                        case "sleep":
-                            script = script + `this.${eve}${eve__}`;
+                        case "sleep": 
+                            script = script + `this.${eve}${eve__};`;
+                            break;
+                        case "uploadImg":
+
+                            break;
+                        case "setvar": case"getvar":
+                            script = script + `this.${eve}(_eve,${eve_});`;
                             break;
                         default:
-                            script = script + `_eve.eq(${i}).${eve}${eve__}`;
+                            script = script + `_eve.eq(${i}).${eve}${eve__};`;
                             break;
                     }
 
@@ -158,7 +174,12 @@ var ELE_EVENTS = ELE_EVENTS||{
                         } 
                         break;
                 }
-                if ($el.length < 0) return;
+                //判断是否有第三个参数
+                if (p[2]!=undefined) {
+                    if (ELE_EVENTS.aisdone == 0) return;
+                }else {
+                    if ($el.length < 0) return;
+                }
                 clearInterval(timer);
                 obj.base_events($el, events_name, params, row);
             }, parseInt(p[0]), parseInt(p[1])||300);
@@ -175,14 +196,14 @@ var ELE_EVENTS = ELE_EVENTS||{
                 
                     default:
                         if (iframe) {
-                            obj.base_events($ele, events_name, params, row);
-                        }else {
                             obj.base_events($($ele, iframe), events_name, params, row);
+                        }else {
+                            obj.base_events($ele, events_name, params, row);
                         }
                         break;
                 }
                 
-            }, parseInt(wait_time)||3 * 1000);
+            }, parseInt(wait_time)*1000||3 * 1000);
         }
     },
     //或者使用for循环
@@ -195,6 +216,23 @@ var ELE_EVENTS = ELE_EVENTS||{
             }, delay * 1000);
         })(delay);
         
+    },
+    //设置一个变量
+    setvar: function(ele, el_attr, attrKey){
+        //el_attr.indexOf("(")!=-1?1:el_attr=el_attr+'()';
+        if(ELE_EVENTS.aisdone == 0) return;
+        var sr = `ele.attr('${el_attr}')`;
+        var retu = eval(sr);
+        var obj = {};
+        this.aSetVar[attrKey]  = retu;
+        return obj;
+    },
+    getvar: function(ele, el_attr, attrKey){
+        if(ELE_EVENTS.aisdone == 0) return;
+        var key = this.aSetVar[attrKey];
+        var sr = `ele.attr('${el_attr}','${key}')`;
+        var retu = eval(sr);  
+
     },
     /** 身份证有关 */
     getIDNum:function(){
@@ -295,6 +333,7 @@ var ELE_EVENTS = ELE_EVENTS||{
     /** 图片有关 */
     //上传图片 imgpath, uploadpath, urlprefix, field, ele)
     uploadImg: function(img){
+        ELE_EVENTS.aisdone = 0;//初始化上传状态
         var obj = this;
         var ele_img = arguments[arguments.length-1];
         var imgph = this.getImgBase64(img.imgpath, function(base64) {
@@ -314,6 +353,7 @@ var ELE_EVENTS = ELE_EVENTS||{
             imgobj.ele_other_model = img.ele_other_model; 
             var result =  obj.uploadimg(imgobj, function(data){
                     //$(sel.imgPhoto, stuDoc).attr("src", imgobj.urlprefix + '/' + data.path);
+                    ELE_EVENTS.aisdone = 1;
                     var script = `data.${imgobj.field}`;
                     var retu = eval(script);
                     retu = imgobj.urlprefix + '/' + retu;
@@ -430,7 +470,10 @@ var ELE_EVENTS = ELE_EVENTS||{
 			},
 			error: function (data) {
 				console.log(data)
-			}
+            },
+            complete: function(data) {
+                ELE_EVENTS.aisdone = 1;
+            }
 		});
         return result;
 	},

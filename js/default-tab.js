@@ -23,13 +23,15 @@ var default_tab = {
             "children": [
                 {"value": 1001, "text": "upload_img", "func":"uploadImg", "description": "上传图片<br>(ele:uploadImg)参数：<br>selector: 图片元素的选择器，为#时则仅上传图片<br>1. imgpath: 图片的url（可直接写stu与coa两张自带的图片，空则默认stu）<br>2. uploadpath:上传图片的url（不支持跨域）<br>3. prepath: 设置元素的图片url的前缀，空默认'../../../photos'<br>4. field: 返回数据中图片地址的字段，空默认为'path'，支持简单多级json'data.img.path'"},
                 {"value": 1002, "text": "wait_time", "func":"sleep", "description": "强制等待或显示等待下个事件<br>(ele:sleep)参数：<br>1. number: 等待*秒后执行下个事件<br>------------<br>[number,number]必须有','<br>1. number: 在*秒中执行下个事件，执行成功立即停止等待（根据下个事件的元素是否定位到）<br>2. number-N: 每*毫秒执行一次"},
+                {"value": 1003, "text": "set_var", "func":"setvar", "description": "设置一个变量<br>(ele:setvar)参数：<br>1. string: 元素的属性<br>2. string: 存时变量的名字"},
+                {"value": 1004, "text": "get_var", "func":"getvar", "description": "获取一个变量<br>(ele:sleep)参数：<br>1. string: 存时变量的名字"}
             ]
         },
         {
             "id": "group3",
             "text": "现成数据",
             "children": [
-                {"value": 2001, "text": "get_name", "func":"getStuName", "description": "获取随机名字<br>(ele:getStuName)参数：<br>1. prename: 名字前缀，空默认为'测试'<br>- 返回:[前缀+市+4位伪随机数]，[市]获取页面标题截取省-市之间或市之前内容，未截取到则默认为空，伪随机数每秒一个"},
+                {"value": 2001, "text": "get_name", "func":"getStuName", "description": "获取随机名字<br>(ele:getStuName)参数：<br>1. prename: 名字前缀，空默认为'测试'<br>- 返回:[市+前缀+4位伪随机数]，[市]获取页面标题截取省-市之间或市之前内容，未截取到则默认为空，伪随机数每秒一个"},
                 {"value": 2002, "text": "get_idnum", "func":"getIDNum", "description": "获取随机身份证号<br>(ele:getIDNum)参数：<br>1. 无参数"},
                 {"value": 2003, "text": "get_phone_number", "func":"getTelPhone", "description": "获取随机手机号<br>(ele:getTelPhone)参数：<br>1. prenumber: 手机号前缀，空默认为'136'<br>- 返回: [前缀+伪随机数]<br>伪随机数根据秒数生成，每秒一个"},
                 {"value": 2100, "text": "get_random_number", "func":"getRDNum", "description": "获取随机数字<br>(ele:getRDNum)参数：<br>1. length: 随机数的长度<br>2. pre-N: 随机数前缀，默认空<br>3. suffix-N: 随机数后缀，默认空<br>- 返回: [前缀+随机数+后缀]"},

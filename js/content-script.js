@@ -158,6 +158,7 @@
 				selectChromeStorageByField("event_list", "btnid", `collapse_${btnmenu_id}`, function (data) {
 					var page_frame = null;//需要特殊处理的连个事件
 					var wait_time = null;//设计的不行 后期cell中加个字段
+					var set_var = {};
 					for (let i = 0; i < data.length; i++) {
 						const el = data[i];
 						$ele = null;
@@ -222,7 +223,7 @@
 								}
 								break;
 						}
-						
+						var result = null;
 						CLICK_EVENT_TAB.some(e => {
 							if(parseInt(e["value"]) === parseInt(el["eventid"])){	
 								//$ele.trigger("focus");
@@ -234,9 +235,9 @@
 									default:
 									
 										if(wait_time){											
-											var a = ELE_EVENTS.base_events_wait(el.selector, page_frame, e.func, el.params, el, wait_time);
+											result = ELE_EVENTS.base_events_wait(el.selector, page_frame, e.func, el.params, el, wait_time);
 										}else{
-											var b = ELE_EVENTS.base_events($ele, e.func, el.params, el);
+											result = ELE_EVENTS.base_events($ele, e.func, el.params, el);
 										}
 
 										wait_time = null;
@@ -247,6 +248,7 @@
 							}
 							
 						});
+						
 					} catch (error) {
 						ELE_EVENTS.log("error",error);
 					}
