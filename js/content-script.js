@@ -161,6 +161,7 @@
 					var set_var = {};
 					for (let i = 0; i < data.length; i++) {
 						const el = data[i];
+						el.selector=="#"?el.selector="":1;
 						$ele = null;
 						//单独处理setframe，先处理不同的事件
 						/*
@@ -327,7 +328,11 @@
 		$("#testbtn1").click(function () {
 
 			console.log("执行添加学员的方法");
-			test();
+			//test();
+			ELE_EVENTS.recordTime((a,b)=>{
+				console.log("hhhhhhhhhhhhhhhhh",b);
+				if (b>3000) return;
+			},10);
 		});
 		$("#floatdiv").dblclick(function () {
 			$("#floatdiv").remove();

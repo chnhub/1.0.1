@@ -157,7 +157,7 @@ var ELE_EVENTS = ELE_EVENTS||{
         var $el = null;
         if(wait_time.indexOf(",")!=-1){
             var p = wait_time.split(",");
-            this.recordTime(function(timer){
+            this.recordTime(function(timer,b){
                 switch (parseInt(row.selectormode)) {
                     case 2:
                         if (iframe) {
@@ -178,8 +178,9 @@ var ELE_EVENTS = ELE_EVENTS||{
                 if (p[2]!=undefined) {
                     if (ELE_EVENTS.aisdone == 0) return;
                 }else {
-                    if ($el.length < 0) return;
+                    if ($el.length <= 0) return;
                 }
+                if($el.css("visibility") == "hidden") return;
                 clearInterval(timer);
                 obj.base_events($el, events_name, params, row);
             }, parseInt(p[0]), parseInt(p[1])||300);
